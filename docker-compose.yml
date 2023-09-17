@@ -1,0 +1,22 @@
+version: '3'
+services: 
+  frontend:
+    build: 
+      dockerfile: ../docker/frontend/Dockerfile
+      context: ./frontend
+    ports: 
+     - "8080:8080"
+  backend:
+    build: 
+      dockerfile: ../docker/server/Dockerfile
+      context: ./server
+    ports: 
+     - "9000:9000"
+  db: 
+    image: postgres:15.4
+    environment:
+        # Local development only.
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - 5432:5432

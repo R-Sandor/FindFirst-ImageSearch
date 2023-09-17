@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-BookmarkitApplication<bookmarkit>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "dev.findfirst.bookmarkit.BookmarkitApplication",
+            "projectName": "bookmarkit",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
