@@ -1,5 +1,7 @@
 # Compiled class file
 *.class
+server/src/main/resources/app.pub
+server/src/main/resources/app.key
 
 # Log file
 *.log
