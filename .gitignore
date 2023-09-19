@@ -2,6 +2,8 @@
 *.class
 server/src/main/resources/app.pub
 server/src/main/resources/app.key
+server/bin/*
+server/build/*
 
 # Log file
 *.log
