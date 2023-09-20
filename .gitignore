@@ -4,7 +4,7 @@ server/src/main/resources/app.pub
 server/src/main/resources/app.key
 server/bin/*
 server/build/*
-
+image_processing/data/*
 # Log file
 *.log
 

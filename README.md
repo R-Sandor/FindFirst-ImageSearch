@@ -74,3 +74,20 @@ eland_import_hub_model --url https://elastic:changeme@127.0.0.1:9200 --hub-model
 If you see on the screen that some models are missing and you see a message `ML job and trained model synchronization required`, go ahead and click the link to synchronize models.
 
 ![](docs/img/model-sync.png)
+
+### 3. Generate image embeddings
+Your next step is to generate the image embeddings from your photos. These embeddings will be used for kNN (vector) search in Elasticsearch.
+
+**Put all your photos in to the folder `image_processing/data` ** . 
+
+**Notes**:
+- you can use sub-folders to maintain sane structure for your images
+- only jp(e)g file types were tested
+- you need to have hundreds of photos to get best results. If you have only a dozen of them, then vector search in the space you create is minimal, and distances between images (vectors) are very similar.
+
+```bash
+$ cd image_embeddings
+$ python3 create-image-embeddings.py --es_host='https://127.0.0.1:9200' \
+  --es_user='elastic' --es_password='changeme' \
+  --ca_certs='../conf/ca.crt'
+```
