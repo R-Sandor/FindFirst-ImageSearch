@@ -1,0 +1,1 @@
+This is where the extracted images, matadata, and other files are placed for the image processing
