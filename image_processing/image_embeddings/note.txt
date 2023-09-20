@@ -1,0 +1,2 @@
+Both of these files were borrowed from:
+https://github.com/radoondas/flask-elastic-image-search/
