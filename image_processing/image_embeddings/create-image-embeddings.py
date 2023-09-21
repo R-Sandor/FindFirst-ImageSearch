@@ -23,10 +23,13 @@ DEST_INDEX = "academic-images"
 DELETE_EXISTING = True
 CHUNK_SIZE = 100
 
-PATH_TO_IMAGES = "../app/static/images/**/*.jp*g"
-PREFIX = "../app/static/images/"
+# PATH_TO_IMAGES = "../data/SciFig/**/*.png" 
+# Sample set
+PATH_TO_IMAGES = "../../frontend/public/*.png"
+# PREFIX = "../data/SciFig/png/"
+PREFIX="../../frontend/public/"
 
-CA_CERT='../app/conf/ess-cloud.cer'
+CA_CERT='../../conf/ca.crt'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--es_host', dest='es_host', required=False, default=ES_HOST,
@@ -47,7 +50,7 @@ parser.add_argument('--timeout', dest='timeout', required=False, default=ES_TIME
 parser.add_argument('--delete_existing', dest='delete_existing', required=False, default=True,
                     action=argparse.BooleanOptionalAction,
                     help="Delete existing indices if they are present in the cluster. Default: True")
-parser.add_argument('--ca_certs', dest='ca_certs', required=False,# default=CA_CERT,
+parser.add_argument('--ca_certs', dest='ca_certs', required=False, default=CA_CERT,
                     help="Path to CA certificate.") # Default: ../app/conf/ess-cloud.cer")
 parser.add_argument('--extract_GPS_location', dest='gps_location', required=False, default=False,
                     action=argparse.BooleanOptionalAction,
@@ -76,21 +79,6 @@ def main():
         doc['image_name'] = os.path.basename(filename)
         doc['image_embedding'] = embedding.tolist()
         doc['relative_path'] = os.path.relpath(filename).split(PREFIX)[1]
-        doc['exif'] = {}
-
-        try:
-            date = get_exif_date(filename)
-            # print(date)
-            doc['exif']['date'] = get_exif_date(filename)
-        except Exception as e:
-            pass
-
-        # Experimental! Extract photo GPS location if available.
-        if args.gps_location:
-            try:
-                doc['exif']['location'] = get_exif_location(filename)
-            except Exception as e:
-                pass
 
         lst.append(doc)
 

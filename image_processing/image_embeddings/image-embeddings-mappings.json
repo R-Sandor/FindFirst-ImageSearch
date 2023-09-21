@@ -19,16 +19,6 @@
       },
       "relative_path" : {
         "type" : "keyword"
-      },
-      "exif" : {
-        "properties" : {
-          "location": {
-            "type": "geo_point"
-          },
-          "date": {
-            "type": "date"
-          }
-        }
       }
     }
   }
