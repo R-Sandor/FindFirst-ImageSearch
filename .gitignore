@@ -5,6 +5,7 @@ server/src/main/resources/app.key
 server/bin/*
 server/build/*
 image_processing/data/*
+.venv
 # Log file
 *.log
 
