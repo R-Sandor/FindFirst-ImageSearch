@@ -19,5 +19,5 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY . /app
 EXPOSE 5000
 ENV FLASK_ENV="development"
-ENV FLASK_APP=server2.py
+ENV FLASK_APP=server.py
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

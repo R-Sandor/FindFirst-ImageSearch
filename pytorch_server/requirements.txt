@@ -5,7 +5,6 @@ flask-wtf==1.0.1
 Pillow~=9.3.0
 sentence-transformers~=2.2.2
 tqdm~=4.64.1
-pandas
 
 # Eland for import NLP models
 torch~=1.11.0
