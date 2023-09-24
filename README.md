@@ -38,15 +38,21 @@ $ docker cp image-search-86-es01-1://usr/share/elasticsearch/config/certs/ca/ca.
 ```
 
 
+### 2. Load NLP models - PREMIUM SERVICE...
+This method does not work for users of the basic license. The strategy then was to use a microservice 
+that would use the sentenceTransformers used in the image_embedding scripts. 
+See pytorch_server.
 
-### 2. Load NLP models 
+The Flask microservice returns the image embedding. 
+
+
 Let's load the NLP model into the application. You will use the `eland` client to load the models. For more details, follow the [documentation](https://www.elastic.co/guide/en/elasticsearch/client/eland/current/index.html).
 
 Go **back** in to the main project directory and import the model using Eland docker image.
 ```bash
 $ cd ../
 # wait until each model is loaded and started. If you do not have enough memory, you will see errors sometimes confusing
-$ eland_import_hub_model --url https://elastic:changeme@127.0.0.1:9200 --hub-model-id sentence-transformers/clip-ViT-B-32-multilingual-v1 --task-type text_embedding --start --ca-certs app/conf/ca.crt
+$ eland_import_hub_model --url https://elastic:changeme@127.0.0.1:9200 --hub-model-id sentence-transformers/clip-ViT-B-32-multilingual-v1 --task-type text_embedding --start --ca-certs conf/ca.crt
 ```
 For ESS cloud Elasticsearch deployment use bundled CA certificate.
 ```bash
