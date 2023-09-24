@@ -23,11 +23,13 @@ DEST_INDEX = "academic-images"
 DELETE_EXISTING = True
 CHUNK_SIZE = 100
 
-# PATH_TO_IMAGES = "../data/SciFig/**/*.png" 
 # Sample set
-PATH_TO_IMAGES = "../../frontend/public/*.png"
-# PREFIX = "../data/SciFig/png/"
-PREFIX="../../frontend/public/"
+#PATH_TO_IMAGES = "../../frontend/public/*.png"
+#PREFIX="../../frontend/public/"
+
+PATH_TO_IMAGES = "../data/SciFig/**/*.png" 
+
+PREFIX = "../data/SciFig/png/"
 
 CA_CERT='../../conf/ca.crt'
 
