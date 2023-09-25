@@ -4,6 +4,7 @@ server/src/main/resources/app.pub
 server/src/main/resources/app.key
 server/bin/*
 server/build/*
+server/.gradle/*
 image_processing/data/*
 image_processing/__pycache__
 .ipynb_checkpoints/*
