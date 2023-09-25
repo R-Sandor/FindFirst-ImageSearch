@@ -6,6 +6,7 @@ server/bin/*
 server/build/*
 image_processing/data/*
 image_processing/__pycache__
+.ipynb_checkpoints
 
 .venv
 # Log file
