@@ -6,7 +6,7 @@ import dev.findfirst.bookmarkit.model.PairWrapper;
 import dev.findfirst.bookmarkit.model.Tag;
 import dev.findfirst.bookmarkit.service.BookmarkService;
 import dev.findfirst.bookmarkit.service.TagService;
-import dev.findfirst.bookmarkit.utilies.Response;
+import dev.findfirst.bookmarkit.utility.Response;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;

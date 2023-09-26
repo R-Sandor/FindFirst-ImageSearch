@@ -3,7 +3,7 @@ package dev.findfirst.bookmarkit.controller;
 import dev.findfirst.bookmarkit.model.Tag;
 import dev.findfirst.bookmarkit.model.TagCntRecord;
 import dev.findfirst.bookmarkit.service.TagService;
-import dev.findfirst.bookmarkit.utilies.Response;
+import dev.findfirst.bookmarkit.utility.Response;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

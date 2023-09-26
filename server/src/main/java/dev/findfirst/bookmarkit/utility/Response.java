@@ -1,4 +1,4 @@
-package dev.findfirst.bookmarkit.utilies;
+package dev.findfirst.bookmarkit.utility;
 
 import java.util.Optional;
 import java.util.function.Consumer;
