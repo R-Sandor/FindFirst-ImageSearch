@@ -1,7 +1,6 @@
 package dev.findfirst.bookmarkit.configuration;
 
 import javax.net.ssl.SSLContext;
-
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -19,33 +18,32 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @EnableElasticsearchRepositories(basePackages = "dev.findfirst.bookmarkit.repository.elastic")
 public class ElasticClient extends ElasticsearchConfiguration {
 
-    @Value("${elastic.username}") String username;
-    @Value("${elastic.password}") String password;
+  @Value("${elastic.username}") String username;
 
-    @Override
-    public ClientConfiguration clientConfiguration() {
-        try {
+  @Value("${elastic.password}") String password;
 
-            // TODO: Should be on the dev profile to run this on self-signed TLS server.
-            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+  @Override
+  public ClientConfiguration clientConfiguration() {
+    try {
 
-            SSLContextBuilder sslBuilder = SSLContexts.custom()
-                    .loadTrustMaterial(null,
-                            (x509Certificates, s) -> true
-                    );
-            final SSLContext sslContext = sslBuilder.build();
+      // TODO: Should be on the dev profile to run this on self-signed TLS server.
+      final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      credentialsProvider.setCredentials(
+          AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
-            return ClientConfiguration.builder()
-                    .connectedTo("localhost:9200")
-                    .usingSsl(sslContext, NoopHostnameVerifier.INSTANCE)
-                    .withConnectTimeout(10000)
-                    .withBasicAuth(username, password)
-                    .build();
-        } catch (Exception e) {
-            // throwing properly
-            return null;
-        }
+      SSLContextBuilder sslBuilder =
+          SSLContexts.custom().loadTrustMaterial(null, (x509Certificates, s) -> true);
+      final SSLContext sslContext = sslBuilder.build();
 
+      return ClientConfiguration.builder()
+          .connectedTo("localhost:9200")
+          .usingSsl(sslContext, NoopHostnameVerifier.INSTANCE)
+          .withConnectTimeout(10000)
+          .withBasicAuth(username, password)
+          .build();
+    } catch (Exception e) {
+      // throwing properly
+      return null;
     }
+  }
 }

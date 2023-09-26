@@ -19,4 +19,11 @@ public class ImageSearchController {
   public ResponseEntity<AcademicImage> getImageById(@RequestParam String id) {
     return new Response<AcademicImage>(imageService.findById(id)).get();
   }
+
+  @RequestMapping("/text")
+  public ResponseEntity<AcademicImage> textSearch(@RequestParam String text) {
+    // return new Response<AcademicImage>(imageService.findByEmbedding()).get();
+    imageService.findByEmbedding();
+    return null;
+  }
 }

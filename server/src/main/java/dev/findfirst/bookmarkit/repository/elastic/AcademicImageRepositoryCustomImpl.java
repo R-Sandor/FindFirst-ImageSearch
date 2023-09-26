@@ -1,31 +1,14 @@
-package dev.findfirst.bookmarkit.service;
+package dev.findfirst.bookmarkit.repository.elastic;
 
-import dev.findfirst.bookmarkit.model.AcademicImage;
-import dev.findfirst.bookmarkit.repository.elastic.AcademicImageRepository;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.StringQuery;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.ComponentScan;
 
-@Service
-@RequiredArgsConstructor
-public class ImageSearchService {
+@ComponentScan
+public class AcademicImageRepositoryCustomImpl implements AcademicImageRepositoryCustom {
 
-  private final AcademicImageRepository imageRepo;
-  private final ElasticsearchOperations elasticsearchOperations;
-
-  public Optional<AcademicImage> findById(String id) {
-    return imageRepo.findByImageId(id);
-  }
-
-  public void findByEmbedding() {
-
-    var query =
-        new StringQuery(
-            """
-            {
+  @Override
+  public String queryByEmbeddings(double[] embeddings) {
+    var q =
+        """
             "script_score": {
               "query": {
                 "match_all": {}
@@ -37,10 +20,8 @@ public class ImageSearchService {
                 }
             }
         }
-    }
-        """);
+        """;
 
-    SearchHits<AcademicImage> searchHits =
-        elasticsearchOperations.search(query, AcademicImage.class);
+    return null;
   }
 }
