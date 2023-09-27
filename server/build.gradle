@@ -55,8 +55,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.1'
 	implementation group: 'org.springframework.data', name: 'spring-data-elasticsearch', version: '5.1.4'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
-
+	compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
@@ -76,5 +78,11 @@ dependencies {
 test {
 	useJUnitPlatform()
 	systemProperty 'spring.profiles.active', 'dev'
-	testLogging.showStandardStreams = true
+	// testLogging.showStandardStreams = true
+
+
+	// Show test results.
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
 }
