@@ -38,7 +38,63 @@ public class ImageSearchService {
     return imageRepo.findByImageId(id);
   }
 
-  public SearchHits<AcademicImage> createQuery(double[] embedding) {
+  public List<AcademicImage> findByQuery(String text, int k) {
+    return createQuery(getEmbeddings(text)).stream()
+        .limit(k)
+        .map(sh -> sh.getContent())
+        .collect(Collectors.toList());
+  }
+
+
+  // Used documentation from https://spring.io/guides/gs/uploading-files/
+  public List<AcademicImage> findSimilarImages(MultipartFile file, int k) throws Exception {
+    String type = file.getContentType();
+    if (file.isEmpty() || !isImage(type)) {
+      throw new Exception("Empty file or Wrong type.");
+    }
+
+    return createQuery(getEmbeddings(file)).stream()
+        .limit(k)
+        .map(sh -> sh.getContent())
+        .collect(Collectors.toList());
+  }
+
+  
+
+  private double[] getEmbeddings(String text) {
+    WebClient client =
+        WebClient.builder()
+            .baseUrl(pytorchUrl)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
+
+    UriSpec<RequestBodySpec> uriSpec = client.method(HttpMethod.GET);
+
+    RequestBodySpec bodySpec = uriSpec.uri(uriBuilder -> uriBuilder.pathSegment("/").build());
+    RequestHeadersSpec<?> headersSpec =
+        bodySpec.bodyValue("""
+      {"query": "dog in snow"}
+      """);
+    Mono<EmbeddingVector> vector =
+        headersSpec.accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(EmbeddingVector.class);
+
+    return vector.block(Duration.ofMillis(2000)).image_embeddings();
+  }
+
+  private double[] getEmbeddings(MultipartFile file){
+     WebClient client = WebClient.create(pytorchUrl);
+    var result =
+        client
+            .post()
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .body(fromMultipartData("file", file.getResource()))
+            .retrieve()
+            .bodyToMono(EmbeddingVector.class);
+   return result.block(Duration.ofMillis(2000)).image_embeddings();
+  }
+
+
+  private SearchHits<AcademicImage> createQuery(double[] embedding) {
     var query =
         new StringQuery(
             """
@@ -59,65 +115,13 @@ public class ImageSearchService {
     return elasticsearchOperations.search(query, AcademicImage.class);
   }
 
-  public List<AcademicImage> findByQuery(String text, int k) {
-    var vector = buildRequest(text).image_embeddings();
-    return createQuery(vector).stream()
-        .limit(k)
-        .map(sh -> sh.getContent())
-        .collect(Collectors.toList());
-  }
-
-  private EmbeddingVector buildRequest(String text) {
-
-    WebClient client =
-        WebClient.builder()
-            .baseUrl(pytorchUrl)
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
-
-    UriSpec<RequestBodySpec> uriSpec = client.method(HttpMethod.GET);
-
-    RequestBodySpec bodySpec = uriSpec.uri(uriBuilder -> uriBuilder.pathSegment("/").build());
-    RequestHeadersSpec<?> headersSpec =
-        bodySpec.bodyValue("""
-      {"query": "dog in snow"}
-      """);
-    Mono<EmbeddingVector> vector =
-        headersSpec.accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(EmbeddingVector.class);
-
-    return vector.block(Duration.ofMillis(2000));
-  }
-
-  // Used documentation from https://spring.io/guides/gs/uploading-files/
-  public List<AcademicImage> findSimilarImages(MultipartFile file, int k) throws Exception {
-    String type = file.getContentType();
-    if (file.isEmpty() || !isImage(type)) {
-      throw new Exception("Empty file or Wrong type.");
-    }
-
-    WebClient client = WebClient.create(pytorchUrl);
-
-    var result =
-        client
-            .post()
-            .contentType(MediaType.MULTIPART_FORM_DATA)
-            .body(fromMultipartData("file", file.getResource()))
-            .retrieve()
-            .bodyToMono(EmbeddingVector.class);
-    var vector = result.block(Duration.ofMillis(2000)).image_embeddings();
-
-    return createQuery(vector).stream()
-        .limit(k)
-        .map(sh -> sh.getContent())
-        .collect(Collectors.toList());
-  }
-
   private boolean isImage(String type) {
     var imageTypes = type.split("/")[1];
     return imageTypes.equalsIgnoreCase("png")
         || imageTypes.equalsIgnoreCase("jpeg")
         || imageTypes.equalsIgnoreCase("jpg");
   }
+
 
   record EmbeddingVector(double[] image_embeddings) {}
 }
