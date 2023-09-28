@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/imagesearch")
@@ -22,8 +23,21 @@ public class ImageSearchController {
 
   @RequestMapping("/text")
   public ResponseEntity<AcademicImage> textSearch(@RequestParam String text) {
-    // return new Response<AcademicImage>(imageService.findByEmbedding()).get();
+    // TODO figure out how to modify the hit list to a number of records
     imageService.findByEmbedding();
     return null;
   }
+
+  
+	@RequestMapping("/image")
+	public ResponseEntity<AcademicImage> handleFileUpload(@RequestParam("image") MultipartFile file) {
+    try {
+      imageService.findSimilarImages(file);
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return null;
+	}
+
 }
