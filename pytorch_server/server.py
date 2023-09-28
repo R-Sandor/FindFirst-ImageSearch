@@ -15,7 +15,7 @@ def encodingToJson(encodings):
     return {'image_embeddings':  encodings.tolist() }
     
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 async def search():
     # do image search
     if 'file' not in request.files:

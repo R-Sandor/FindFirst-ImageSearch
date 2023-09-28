@@ -24,7 +24,7 @@ public class ImageSearchController {
   @RequestMapping("/text")
   public ResponseEntity<AcademicImage> textSearch(@RequestParam String text) {
     // TODO figure out how to modify the hit list to a number of records
-    imageService.findByEmbedding();
+    imageService.findByQuery(text);
     return null;
   }
 
