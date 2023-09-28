@@ -1,22 +1,23 @@
 package dev.findfirst.bookmarkit.service;
 
+import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
+
 import dev.findfirst.bookmarkit.model.AcademicImage;
 import dev.findfirst.bookmarkit.repository.elastic.AcademicImageRepository;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.StringQuery;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodySpec;
@@ -28,7 +29,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ImageSearchService {
 
-  @Value("${microservice.pytorch.url: http://localhost:5000}") private String pytorchUrl;
+  @Value("${microservice.pytorch.url:http://localhost:5000/}") private String pytorchUrl;
 
   private final AcademicImageRepository imageRepo;
   private final ElasticsearchOperations elasticsearchOperations;
@@ -37,9 +38,7 @@ public class ImageSearchService {
     return imageRepo.findByImageId(id);
   }
 
-  public void findByQuery(String text) {
-
-    var vector = buildRequest(text).image_embeddings();
+  public SearchHits<AcademicImage> createQuery(double[] embedding) {
     var query =
         new StringQuery(
             """
@@ -55,10 +54,17 @@ public class ImageSearchService {
               }
             }
             """
-                .formatted(Arrays.toString(vector)));
+                .formatted(Arrays.toString(embedding)));
 
-    SearchHits<AcademicImage> searchHits =
-        elasticsearchOperations.search(query, AcademicImage.class);
+    return elasticsearchOperations.search(query, AcademicImage.class);
+  }
+
+  public List<AcademicImage> findByQuery(String text, int k) {
+    var vector = buildRequest(text).image_embeddings();
+    return createQuery(vector).stream()
+        .limit(k)
+        .map(sh -> sh.getContent())
+        .collect(Collectors.toList());
   }
 
   private EmbeddingVector buildRequest(String text) {
@@ -83,25 +89,27 @@ public class ImageSearchService {
   }
 
   // Used documentation from https://spring.io/guides/gs/uploading-files/
-  public void findSimilarImages(MultipartFile file) throws Exception {
+  public List<AcademicImage> findSimilarImages(MultipartFile file, int k) throws Exception {
     String type = file.getContentType();
     if (file.isEmpty() || !isImage(type)) {
       throw new Exception("Empty file or Wrong type.");
     }
 
-    MultipartBodyBuilder builder = new MultipartBodyBuilder();
-    builder.part("file", file.getResource());
-    MultiValueMap<String, HttpEntity<?>> parts = builder.build();
     WebClient client = WebClient.create(pytorchUrl);
-    Mono<EmbeddingVector> result =
+
+    var result =
         client
             .post()
             .contentType(MediaType.MULTIPART_FORM_DATA)
-            .bodyValue(parts)
+            .body(fromMultipartData("file", file.getResource()))
             .retrieve()
             .bodyToMono(EmbeddingVector.class);
+    var vector = result.block(Duration.ofMillis(2000)).image_embeddings();
 
-    result.block(Duration.ofMillis(2000));
+    return createQuery(vector).stream()
+        .limit(k)
+        .map(sh -> sh.getContent())
+        .collect(Collectors.toList());
   }
 
   private boolean isImage(String type) {

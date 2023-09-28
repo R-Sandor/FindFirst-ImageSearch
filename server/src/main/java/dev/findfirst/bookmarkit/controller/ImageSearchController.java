@@ -23,8 +23,7 @@ public class ImageSearchController {
 
   @RequestMapping("/text")
   public ResponseEntity<AcademicImage> textSearch(@RequestParam String text) {
-    // TODO figure out how to modify the hit list to a number of records
-    imageService.findByQuery(text);
+    imageService.findByQuery(text, 10);
     return null;
   }
 
@@ -32,7 +31,7 @@ public class ImageSearchController {
 	@RequestMapping("/image")
 	public ResponseEntity<AcademicImage> handleFileUpload(@RequestParam("image") MultipartFile file) {
     try {
-      imageService.findSimilarImages(file);
+      imageService.findSimilarImages(file, 10);
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
