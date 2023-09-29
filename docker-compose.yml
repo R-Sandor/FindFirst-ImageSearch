@@ -6,6 +6,10 @@ services:
       context: ./frontend
     ports: 
      - "8080:8080"
+    volumes:
+      - nfs-data/SciFig/png/:/public/images
+    environment:
+      - IMAGE_DIR=images
   backend:
     build: 
       dockerfile: ../docker/server/Dockerfile
@@ -25,5 +29,5 @@ services:
       driver: local
       driver_opts: 
       type: nfs
-      o: nfsvers=4, addr=nfs.findfirst.dev, rw
-      device: ":/data"
+      o: nfsvers=4, addr=10.0.0.1, rw
+      device: ":data"

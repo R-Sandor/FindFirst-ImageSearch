@@ -6,12 +6,19 @@ import BookmarkGroup from "@/components/bookmark/BookmarkGroup";
 import { BookmarkProvider } from "@/contexts/BookmarkContext";
 import UseAuth from "@components/UseAuth";
 import { Badge } from "react-bootstrap";
+const IMAGE_DIR = process.env.IMAGE_DIR; 
 
 export interface CardData {
   title: string;
   pdf: string;
   imgSrc: string;
   figure: string;
+}
+
+
+function imagePath(path:string): string {
+  console.log(IMAGE_DIR)
+  return IMAGE_DIR+"/"+path;
 }
 
 export default function App() {
@@ -73,7 +80,7 @@ export default function App() {
     {
       title: "Table 9: The results show only the evidence class and are macro-averaged...",
       pdf: "D19-66.pdf",
-      imgSrc: "D19-66.pdf-Table9.png",
+      imgSrc: imagePath("P11-1162.pdf-Figure1.png"),
       figure: "Table"
     },
   ];
