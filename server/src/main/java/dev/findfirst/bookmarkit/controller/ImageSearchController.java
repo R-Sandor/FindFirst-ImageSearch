@@ -3,7 +3,11 @@ package dev.findfirst.bookmarkit.controller;
 import dev.findfirst.bookmarkit.model.AcademicImage;
 import dev.findfirst.bookmarkit.service.ImageSearchService;
 import dev.findfirst.bookmarkit.utility.Response;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,21 +26,17 @@ public class ImageSearchController {
   }
 
   @RequestMapping("/text")
-  public ResponseEntity<AcademicImage> textSearch(@RequestParam String text) {
-    imageService.findByQuery(text, 10);
-    return null;
+  public ResponseEntity<List<AcademicImage>> textSearch(@RequestParam String text) {
+    return new Response<List<AcademicImage>>(imageService.findByQuery(text, 10), HttpStatus.OK).get();
   }
 
   
 	@RequestMapping("/image")
-	public ResponseEntity<AcademicImage> handleFileUpload(@RequestParam("image") MultipartFile file) {
+	public ResponseEntity<List<AcademicImage>> handleFileUpload(@RequestParam("image") MultipartFile file) {
     try {
-      imageService.findSimilarImages(file, 10);
+      return new Response<List<AcademicImage>>(imageService.findSimilarImages(file, 10), HttpStatus.OK).get();
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    return null;
 	}
-
 }

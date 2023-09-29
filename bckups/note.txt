@@ -1,0 +1,2 @@
+# Place to store backups. 
+Running the back up script will place the elasticsearch data in here. 

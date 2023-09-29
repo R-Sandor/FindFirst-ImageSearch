@@ -8,6 +8,8 @@ server/.gradle/*
 image_processing/data/*
 image_processing/__pycache__
 .ipynb_checkpoints/*
+data/**
+bckups/*.tar
 
 .venv
 # Log file

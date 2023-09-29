@@ -27,9 +27,9 @@ CHUNK_SIZE = 100
 #PATH_TO_IMAGES = "../../frontend/public/*.png"
 #PREFIX="../../frontend/public/"
 
-PATH_TO_IMAGES = "../data/SciFig/**/*.png" 
+PATH_TO_IMAGES = "../../data/SciFig/**/*.png" 
 
-PREFIX = "../data/SciFig/png/"
+PREFIX = "../../data/SciFig/png/"
 
 CA_CERT='../../conf/ca.crt'
 
