@@ -40,9 +40,14 @@ const api = {
     return this.execute("GET", "bookmarks", null, {});
   },
   bookmarkAddTagByTitle(bookmarkId: string | number, tagTitle: string) {
-    return this.execute("POST", "bookmark/" + bookmarkId + "/addTag", {
-      tag_title: tagTitle,
-    }, {});
+    return this.execute(
+      "POST",
+      "bookmark/" + bookmarkId + "/addTag",
+      {
+        tag_title: tagTitle,
+      },
+      {}
+    );
   },
   bookmarkRemoveTagById(bookmarkId: string | number, tagId: number) {
     return instance.delete("bookmark/" + bookmarkId + "/tagId", {
@@ -57,7 +62,7 @@ const api = {
   getAllTags() {
     return this.execute("GET", "tagscnt", null, {});
   },
-  addAllTag(strTags: string []) {
+  addAllTag(strTags: string[]) {
     let t = JSON.stringify(strTags);
     console.log(t);
     return this.execute("POST", "tags/addTags", strTags, {});
@@ -67,15 +72,23 @@ const api = {
   },
   // (U)pdate
   updateForId(id: string, text: any, completed: any) {
-    return this.execute("PUT", "bookmarks/" + id, {
-      title: text,
-      completed: completed,
-    }, {});
+    return this.execute(
+      "PUT",
+      "bookmarks/" + id,
+      {
+        title: text,
+        completed: completed,
+      },
+      {}
+    );
   },
 
   // (D)elete
   removeBookmarkById(id: string) {
     return this.execute("DELETE", "bookmarks/" + id, null, {});
+  },
+  ImageSearchText(searchText: string) {
+    return instance.post("imagesearch/text", null, { params: { text: searchText } });
   },
 };
 

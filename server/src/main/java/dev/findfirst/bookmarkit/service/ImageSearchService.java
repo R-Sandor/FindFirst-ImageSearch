@@ -39,12 +39,12 @@ public class ImageSearchService {
   }
 
   public List<AcademicImage> findByQuery(String text, int k) {
+    System.out.println(text);
     return createQuery(getEmbeddings(text)).stream()
         .limit(k)
         .map(sh -> sh.getContent())
         .collect(Collectors.toList());
   }
-
 
   // Used documentation from https://spring.io/guides/gs/uploading-files/
   public List<AcademicImage> findSimilarImages(MultipartFile file, int k) throws Exception {
@@ -59,8 +59,6 @@ public class ImageSearchService {
         .collect(Collectors.toList());
   }
 
-  
-
   private double[] getEmbeddings(String text) {
     WebClient client =
         WebClient.builder()
@@ -73,16 +71,16 @@ public class ImageSearchService {
     RequestBodySpec bodySpec = uriSpec.uri(uriBuilder -> uriBuilder.pathSegment("/").build());
     RequestHeadersSpec<?> headersSpec =
         bodySpec.bodyValue("""
-      {"query": "dog in snow"}
-      """);
+      {"query": "%s" }
+      """.formatted(text));
     Mono<EmbeddingVector> vector =
         headersSpec.accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(EmbeddingVector.class);
 
     return vector.block(Duration.ofMillis(2000)).image_embeddings();
   }
 
-  private double[] getEmbeddings(MultipartFile file){
-     WebClient client = WebClient.create(pytorchUrl);
+  private double[] getEmbeddings(MultipartFile file) {
+    WebClient client = WebClient.create(pytorchUrl);
     var result =
         client
             .post()
@@ -90,9 +88,8 @@ public class ImageSearchService {
             .body(fromMultipartData("file", file.getResource()))
             .retrieve()
             .bodyToMono(EmbeddingVector.class);
-   return result.block(Duration.ofMillis(2000)).image_embeddings();
+    return result.block(Duration.ofMillis(2000)).image_embeddings();
   }
-
 
   private SearchHits<AcademicImage> createQuery(double[] embedding) {
     var query =
@@ -121,7 +118,6 @@ public class ImageSearchService {
         || imageTypes.equalsIgnoreCase("jpeg")
         || imageTypes.equalsIgnoreCase("jpg");
   }
-
 
   record EmbeddingVector(double[] image_embeddings) {}
 }

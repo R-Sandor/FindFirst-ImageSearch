@@ -24,6 +24,7 @@ app.prepare().then(() => {
         handle(req, res, parsedUrl);
     }).listen(port, (err) => {
         if (err) throw err;
+        console.log("RUNNING")
         console.log("ready - started server on url: https://localhost:" + port);
     });
 });

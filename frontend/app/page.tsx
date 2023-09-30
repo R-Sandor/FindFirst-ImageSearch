@@ -1,24 +1,15 @@
 "use client";
 import "./main.css";
-import TagList from "@components/TagList";
-import { TagCntProvider } from "contexts/TagContext";
-import BookmarkGroup from "@/components/bookmark/BookmarkGroup";
-import { BookmarkProvider } from "@/contexts/BookmarkContext";
+import  SearchBar  from "@/components/search/Searchbar";
 import UseAuth from "@components/UseAuth";
 import { Badge } from "react-bootstrap";
+import { FigureData } from "@/types/Bookmarks/FigureData";
+import { useEffect, useState } from "react";
 const IMAGE_DIR = process.env.IMAGE_DIR; 
 
-export interface CardData {
-  title: string;
-  pdf: string;
-  imgSrc: string;
-  figure: string;
-}
-
-
 function imagePath(path:string): string {
-  console.log(IMAGE_DIR)
-  return IMAGE_DIR+"/"+path;
+  // use the specified directory or default
+  return IMAGE_DIR != (undefined || null) ? IMAGE_DIR+"/"+path  : "png/"+ path
 }
 
 export default function App() {
@@ -45,90 +36,22 @@ export default function App() {
     "Word Cloud",
   ];
 
-  let cardData: CardData[] = [
-    {
-      title:
-        "Table 2: The correlation between the self-reported Likert scale ratings...",
-      pdf: "2020.acl-main.126.pdf",
-      imgSrc: "2020.acl-main.126.pdf-Table2.png",
-      figure: "Table"
-    },
-    {
-      title: "Figure 2: Real-Time Hand Trajectory Tracking for the Sign FARM",
-      pdf: "2020.signlang-1.22.pdf",
-      imgSrc: "2020.signlang-1.22.pdf-Figure2.png",
-      figure: "Neural Networks"
-    },
-    {
-      title: "Table 1: Inter-agreement among human annotators",
-      pdf: "C16-1101.pdf",
-      imgSrc: "C16-1101.pdf-Table1.png",
-      figure: "Table"
-    },
-    {
-      title: "Figure 5: Dependency parsing: Confidence vs. unlabeled dependency accuracy",
-      pdf: "D12-1091.pdf",
-      imgSrc: "D12-1091.pdf-Figure5.png",
-      figure: "Graph"
-    },
-    {
-      title: "Table 1: Comparison of the me thods together with other...",
-      pdf: "D16-1245.pdf",
-      imgSrc: "D16-1245.pdf-Table1.png",
-      figure: "Graph"
-    },
-    {
-      title: "Table 9: The results show only the evidence class and are macro-averaged...",
-      pdf: "D19-66.pdf",
-      imgSrc: imagePath("P11-1162.pdf-Figure1.png"),
-      figure: "Table"
-    },
-  ];
-  /**
-   * Ideally when the user visits the site they will actually have a cool landing page
-   * rather than redirecting them immediately to sign in.
-   * Meaning that the '/' will eventually be added to the public route and not authenticated will be the
-   * the regular landing.
-   */
-  // return userAuth ? (
-  //   <BookmarkProvider>
-  //     <TagCntProvider>
-  //       <div className="row">
-  //         <div className="col-md-4 col-lg-3">
-  //           <TagList />
-  //         </div>
-  //         <div className="col-md-8 col-lg-9">
-  //           <BookmarkGroup />
-  //         </div>
-  //       </div>
-  //     </TagCntProvider>
-  //   </BookmarkProvider>
-  // ) : (
-  //   <div> Hello Welcome to BookmarkIt. </div>
-  // );
+  const[cardData, setCardData] = useState<FigureData[]>([])
+
+  useEffect(() => {
+    console.log(cardData)
+  }, [cardData])
 
   return (
     <div className="row">
       <div className="row">
-        <div className="pt-5 pb-5 half-width-form-control">
-          <div className="input-group">
-            <input
-              type="search"
-              className="form-control rounded"
-              placeholder="Describe your figure!"
-              aria-label="Search"
-              aria-describedby="search-addon"
-            />
-            <button type="button" className="btn btn-outline-primary">
-              search
-            </button>
-          </div>
-        </div>
+        <SearchBar setCardData={setCardData} searchResults={cardData}/> 
       </div>
       <div className="col-2">
         <div className="ml-6 features">
           Figure Types:
-          {catagories.map((val, i) => {
+          {
+            catagories.map((val, i) => {
             return (
               <div key={i} className="form-check">
                 <input
@@ -148,11 +71,12 @@ export default function App() {
       <div className="col-9">
         <div className="row">
           {cardData.map((card, i) => {
+            console.log(card)
             return (
               <div key={i} className="card mr-10 cstyle">
                 <img
                   className="card-img"
-                  src={card.imgSrc}
+                  src={imagePath(card.relativePath)}
                   alt="Card image cap"
                 />
                 <div className="card-body">
