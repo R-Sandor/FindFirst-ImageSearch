@@ -1,8 +1,8 @@
 package dev.findfirst.bookmarkit.users.service;
 
-import dev.findfirst.bookmarkit.security.execeptions.NoUserFoundException;
 import dev.findfirst.bookmarkit.users.model.user.User;
 import dev.findfirst.bookmarkit.users.repository.UserRepo;
+import dev.findfirst.security.execeptions.NoUserFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,7 @@ package dev.findfirst.bookmarkit.repository;
 
 import dev.findfirst.bookmarkit.model.Bookmark;
 import dev.findfirst.bookmarkit.model.TagCntRecord;
-import dev.findfirst.bookmarkit.security.contexts.TenantContext;
+import dev.findfirst.security.contexts.TenantContext;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

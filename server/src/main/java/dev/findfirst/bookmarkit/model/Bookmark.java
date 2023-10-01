@@ -1,6 +1,5 @@
 package dev.findfirst.bookmarkit.model;
 
-import dev.findfirst.bookmarkit.security.model.Tenantable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +12,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
+
+import dev.findfirst.security.model.Tenantable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -2,7 +2,8 @@ package dev.findfirst.bookmarkit.repository;
 
 import dev.findfirst.bookmarkit.model.Bookmark;
 import dev.findfirst.bookmarkit.model.Tag;
-import dev.findfirst.bookmarkit.security.tenant.repository.TenantableRepository;
+import dev.findfirst.security.tenant.repository.TenantableRepository;
+
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
