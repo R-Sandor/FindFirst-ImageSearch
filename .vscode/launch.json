@@ -2,10 +2,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "BookmarkitApplication",
+            "request": "launch",
+            "mainClass": "dev.BookmarkitApplication",
+            "projectName": "bookmarkit"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-BookmarkitApplication<bookmarkit>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.findfirst.bookmarkit.BookmarkitApplication",
+            "projectName": "bookmarkit",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-BookmarkitApplication<bookmarkit>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "dev.findfirst.BookmarkitApplication",
             "projectName": "bookmarkit",
             "args": "",
             "envFile": "${workspaceFolder}/.env"

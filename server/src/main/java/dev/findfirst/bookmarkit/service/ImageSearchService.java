@@ -2,8 +2,8 @@ package dev.findfirst.bookmarkit.service;
 
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
 
-import dev.findfirst.bookmarkit.model.AcademicImage;
-import dev.findfirst.bookmarkit.repository.elastic.AcademicImageRepository;
+import dev.findfirst.imagesearch.model.AcademicImage;
+import dev.findfirst.imagesearch.repository.AcademicImageRepository;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;

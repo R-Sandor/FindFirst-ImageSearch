@@ -1,4 +1,4 @@
-package dev.findfirst.bookmarkit.model;
+package dev.findfirst.imagesearch.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

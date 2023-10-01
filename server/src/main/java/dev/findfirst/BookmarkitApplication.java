@@ -1,4 +1,4 @@
-package dev.findfirst.bookmarkit;
+package dev.findfirst;
 
 import java.util.Arrays;
 import java.util.Collections;

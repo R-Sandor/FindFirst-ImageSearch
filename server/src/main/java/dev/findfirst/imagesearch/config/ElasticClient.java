@@ -1,4 +1,4 @@
-package dev.findfirst.bookmarkit.configuration;
+package dev.findfirst.imagesearch.config;
 
 import javax.net.ssl.SSLContext;
 import org.apache.http.auth.AuthScope;
@@ -15,7 +15,7 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfigurat
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "dev.findfirst.bookmarkit.repository.elastic")
+@EnableElasticsearchRepositories(basePackages = "dev.findfirst.imagesearch.repositor")
 public class ElasticClient extends ElasticsearchConfiguration {
 
   @Value("${elastic.username}") String username;
