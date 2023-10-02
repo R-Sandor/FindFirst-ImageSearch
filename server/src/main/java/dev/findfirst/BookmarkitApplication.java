@@ -1,7 +1,13 @@
 package dev.findfirst;
 
+import dev.findfirst.imagesearch.utility.MetadataHandler;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -12,7 +18,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @SpringBootApplication
-public class BookmarkitApplication {
+@Slf4j
+public class BookmarkitApplication implements ApplicationRunner {
+
+  @Autowired private MetadataHandler metadataHandler;
 
   public static void main(String[] args) {
     SpringApplication.run(BookmarkitApplication.class, args);
@@ -42,5 +51,16 @@ public class BookmarkitApplication {
         new FilterRegistrationBean<CorsFilter>(new CorsFilter(source));
     bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
     return bean;
+  }
+
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+    System.out.println(args.getOptionNames());
+    if (args.containsOption("readMetadata")) {
+      log.debug("Uploading metadata");
+      var path = Paths.get(args.getOptionValues("readMetadata").get(0));
+      metadataHandler.readJSON(path);
+    }
+    // TODO Auto-generated method stub
   }
 }
