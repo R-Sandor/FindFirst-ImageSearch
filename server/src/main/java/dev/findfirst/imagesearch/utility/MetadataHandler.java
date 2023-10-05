@@ -75,7 +75,7 @@ public class MetadataHandler {
 
     // Predict the figures types.
     var updatedMetaData = this.predictFigures(figureMap.values().stream().filter(md -> md.type().equals("Figure")));
-    updatedMetaData.forEach(newData -> figureMap.put(documentID(dbIDPrefix, newData) , newData));
+    //updatedMetaData.forEach(newData -> figureMap.put(documentID(dbIDPrefix, newData) , newData));
 
     log.info("imageIds {}", figureMap.values());
 
@@ -89,6 +89,7 @@ public class MetadataHandler {
    * @return
    */
   private List<MetaData> predictFigures(Stream<MetaData> stream) {
+
       return null;
   }
 

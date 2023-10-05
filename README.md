@@ -13,10 +13,9 @@ broadly state my sources here:
   - Including the setup in this very ReadMe.md.
 
 
-# 0 Step. 
+### 0 Step. 
 We must set up a Python environment to use scripts for image embeddings. 
 ```bash
-$ cd flask-elastic-image-search
 $ python3 -m venv .venv
 $ source .venv/bin/activate
 $ pip install -r requirements.txt

@@ -1,4 +1,4 @@
-package dev.findfirst.bookmarkit.service;
+package dev.findfirst.imagesearch.service;
 
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
 
@@ -66,7 +66,7 @@ public class ImageSearchService {
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build();
 
-    UriSpec<RequestBodySpec> uriSpec = client.method(HttpMethod.GET);
+    UriSpec<RequestBodySpec> uriSpec = client.method(HttpMethod.GET); // GET
 
     RequestBodySpec bodySpec = uriSpec.uri(uriBuilder -> uriBuilder.pathSegment("/").build());
     RequestHeadersSpec<?> headersSpec =
@@ -83,7 +83,7 @@ public class ImageSearchService {
     WebClient client = WebClient.create(pytorchUrl);
     var result =
         client
-            .post()
+            .post() // POST
             .contentType(MediaType.MULTIPART_FORM_DATA)
             .body(fromMultipartData("file", file.getResource()))
             .retrieve()

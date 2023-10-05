@@ -1,8 +1,9 @@
 package dev.findfirst.imagesearch.controller;
 
-import dev.findfirst.bookmarkit.service.ImageSearchService;
 import dev.findfirst.bookmarkit.utility.Response;
 import dev.findfirst.imagesearch.model.AcademicImage;
+import dev.findfirst.imagesearch.service.ImageSearchService;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

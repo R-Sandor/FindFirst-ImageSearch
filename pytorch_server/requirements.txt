@@ -3,11 +3,14 @@ flask[async]
 flask-cors
 flask-wtf==1.0.1
 Pillow~=9.3.0
-sentence-transformers~=2.2.2
+# sentence-transformers~=2.2.2
 tqdm~=4.64.1
-
-# Eland for import NLP models
-torch~=1.11.0
+WerkZeug==2.2.2
+-i https://download.pytorch.org/whl/cu116
+torch==1.13.1+cu116 
+git+https://github.com/openai/CLIP.git
+ftfy 
+regex 
 
 # required by '.env' and '.flaskenv' files
 python-dotenv~=0.21.1
@@ -18,5 +21,3 @@ exif==1.5.0
 # required only for RAW images conversion
 # rawpy==0.17.3
 # imageio==2.22.4
-
-# Don't care what version any will do.

@@ -6,9 +6,10 @@ import glob
 import time
 import json
 import argparse
-from sentence_transformers import SentenceTransformer
 from elasticsearch import Elasticsearch, SSLError
 from elasticsearch.helpers import parallel_bulk
+import torch
+import clip
 from PIL import Image
 from tqdm import tqdm
 from datetime import datetime
@@ -22,6 +23,9 @@ ES_TIMEOUT = 3600
 DEST_INDEX = "academic-images"
 DELETE_EXISTING = True
 CHUNK_SIZE = 100
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model, preprocess = clip.load("ViT-B/32", device=device)
 
 # Sample set
 #PATH_TO_IMAGES = "../../frontend/public/*.png"
@@ -66,14 +70,14 @@ def main():
     lst = []
 
     start_time = time.perf_counter()
-    img_model = SentenceTransformer('clip-ViT-B-32')
+    img_model = model
     duration = time.perf_counter() - start_time
     print(f'Duration load model = {duration}')
 
     filenames = glob.glob(PATH_TO_IMAGES, recursive=True)
     start_time = time.perf_counter()
     for filename in tqdm(filenames, desc='Processing files', total=len(filenames)):
-        image = Image.open(filename)
+        image = preprocess(Image.open(filename)).unsqueeze(0).to(device)
 
         doc = {}
         embedding = image_embedding(image, img_model)
@@ -152,7 +156,7 @@ def main():
 
 
 def image_embedding(image, model):
-    return model.encode(image)
+    return model.encode_image(image)
 
 
 def create_image_id(filename):

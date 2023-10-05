@@ -10,6 +10,7 @@ image_processing/__pycache__
 .ipynb_checkpoints/*
 data/**
 bckups/*.tar
+**/__pycache__/*
 
 .venv
 # Log file
