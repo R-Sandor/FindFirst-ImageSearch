@@ -1,8 +1,11 @@
 package dev.findfirst.imagesearch.utility;
 
+import dev.findfirst.imagesearch.service.TorchService;
+import dev.findfirst.imagesearch.service.TorchService.Predictions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -10,19 +13,23 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class MetadataHandler {
+
+  private final TorchService torch;
 
   public void readJSON(Path p) {
     if (p.toFile().exists() && p.toFile().isFile()) {
       log.info("file exists: {}", p.toFile().exists());
       log.info("Reading fom {}", p);
-
+      
       try {
         // We know that the file size is adequate and do not need to use lazy list.
         var map = new JacksonJsonParser().parseMap(Files.readString(p));
@@ -38,11 +45,14 @@ public class MetadataHandler {
         var regionless = (List<Map>) rawTypes.get(("regionless-captions"));
 
         // Used map to handle key collision with merge function.
-        var figures = 
+        var figures =
             Stream.of(formattedFigures, rawFigListMap, regionless)
                 .flatMap(listOfMap -> listOfMap.stream())
                 .filter(m -> m != null) // Skipping nulls
-                .map(MetaData::new)
+                .map(
+                    mapEntry -> {
+                      return new MetaData(mapEntry, Paths.get(prefix(p) ));
+                    })
                 .collect(
                     Collectors.toMap(
                         (f) -> f.type() + f.figName(),
@@ -59,50 +69,63 @@ public class MetadataHandler {
   }
 
   private void saveMetaDataToDb(Collection<MetaData> figures, Path jsonPath) {
-    var fname = jsonPath.getFileName().toString();
-    log.info("filename {}", fname);
-    final var prefix = fname.split("deepfigures*")[0];
-    final var dbIDPrefix = prefix + ".pdf-";
-    log.info("prefix {}", prefix);
-    // Example of what an imageId looks like from the database: P14-2074.pdf-Figure1.
-    // Split the file name before deep figure.
     var figureMap = new HashMap<String, MetaData>();
-    figures.stream().forEach( 
-      metaData -> {
-        var imageId =  documentID(dbIDPrefix, metaData);
-        figureMap.put(imageId, metaData);
-    });
+    figures.stream()
+        .forEach(
+            metaData -> {
+              var imageId = documentID(jsonPath, metaData);
+              figureMap.put(imageId, metaData);
+            });
 
     // Predict the figures types.
-    var updatedMetaData = this.predictFigures(figureMap.values().stream().filter(md -> md.type().equals("Figure")));
-    //updatedMetaData.forEach(newData -> figureMap.put(documentID(dbIDPrefix, newData) , newData));
+    var updatedMetaData =
+        this.predictFigures(figureMap.values().stream().filter(md -> md.type().equals("Figure")));
+    updatedMetaData.forEach(newData -> figureMap.put(documentID(jsonPath, newData) , newData));
 
     log.info("imageIds {}", figureMap.values());
-
   }
 
   /**
-   * Calls the database on those documents that do not have a figure type. 
-   * The highest confidence of the document types (barchart, scatterplot, etc) is then 
-   * saved to the metadata then latter to the document for facid search 
+   * Calls the database on those documents that do not have a figure type. The highest confidence of
+   * the document types (barchart, scatterplot, etc) is then saved to the metadata then latter to
+   * the document for facid search
+   *
    * @param stream
    * @return
    */
   private List<MetaData> predictFigures(Stream<MetaData> stream) {
-
-      return null;
+    return stream
+        .map(
+            md -> {
+              Predictions predictions = torch.predict(md);
+              return new MetaData(
+                  md.type(), md.figName(), md.caption(), md.filePath(), predictions);
+            })
+        .toList();
   }
 
   /**
-   * Utility function to get the documentID
+   * Utility function to get the documentID.
+   *
    * @param prefix the prefix of the document; Obtained by JSON filename.
    * @param metaData the actual MetaData to get figure, name.
    * @return documentID
    */
-  private String documentID(String prefix, MetaData metaData) {
-    return prefix +  metaData.type() + metaData.figName();
+  private String documentID(Path jsonPath, MetaData metaData) {
+    // Example of what an imageId looks like from the database: P14-2074.pdf-Figure1.
+    // Split the file name before deep figure.
+    final var dbIDPrefix = prefix(jsonPath);
+    log.info("filename {}", jsonPath.toString());
+    log.info("prefix {}", dbIDPrefix);
+
+    return dbIDPrefix + metaData.type() + metaData.figName();
   }
 
-  private void predictFigures(List<String> imageIds) {
+
+
+  private String prefix(Path fileName) {
+    return fileName.toString().split("deepfigures*")[0] + ".pdf-";
   }
+
+  private void predictFigures(List<String> imageIds) {}
 }

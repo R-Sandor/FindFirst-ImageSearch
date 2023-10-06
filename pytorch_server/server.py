@@ -74,12 +74,15 @@ async def search():
 # This function handles making the confidence level of the categories.
 @app.route('/predict', methods=['POST'])
 async def predict():
-    dict_predictions = {}
+    file = request.files['file']
+    if file.filename == '':
+        print("No record")
+        return "Record not found", 400
     with torch.no_grad():
-        imagePrep = preprocess(Image.open("../data/SciFig/png/Y18-3008.pdf-Figure1.png")).unsqueeze(0).to(device)
+        imagePrep = preprocess(Image.open(file)).unsqueeze(0).to(device)
         image_features = model.encode_image(imagePrep)
         text_features = model.encode_text(text_inputs)
-        # Pick the top 5 most similar labels for the image
+        # Pick the top 3 most similar labels for the image
     image_features /= image_features.norm(dim=-1, keepdim=True)
     text_features /= text_features.norm(dim=-1, keepdim=True)
     similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
@@ -87,7 +90,14 @@ async def predict():
 
     # Print the result
     print("\nTop predictions:\n")
+    predictions = []
     for value, index in zip(values, indices):
-        dict_predictions[labels[index]] = f"{100 * value.item():.2f}"
+        record = {}
+        record["label"] = labels[index]
+        record["confidence"]= f"{100 * value.item():.2f}"
+        predictions.append(record)
         print(f"{labels[index]:>16s}: {100 * value.item():.2f}%")
-    return json.dumps(dict_predictions)
+    top_predictions["predictions"] = predictions
+    return { 
+        'predictions': predictions
+    } 

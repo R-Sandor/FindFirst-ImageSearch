@@ -15,7 +15,7 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfigurat
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "dev.findfirst.imagesearch.repositor")
+@EnableElasticsearchRepositories(basePackages = "dev.findfirst.imagesearch.repository")
 public class ElasticClient extends ElasticsearchConfiguration {
 
   @Value("${elastic.username}") String username;

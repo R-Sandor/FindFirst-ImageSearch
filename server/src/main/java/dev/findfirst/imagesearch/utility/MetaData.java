@@ -1,14 +1,31 @@
 package dev.findfirst.imagesearch.utility;
 
-import java.util.Map;
+import dev.findfirst.imagesearch.service.TorchService.Predictions;
+import lombok.extern.slf4j.Slf4j;
 
-record MetaData(String type, String figName, String caption) {
-  public MetaData(Map m) {
-    this(getFigure(m), m.get("name"), getCaption(m));
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+@Slf4j
+public record MetaData(
+    String type, String figName, String caption, Path filePath, Predictions predictions) {
+  public MetaData {
+    // canonicaol constructor sets the file path and prediction.
+    if (filePath != null) {
+      var fileName = filePath.getFileName();
+      log.debug("filename {}", fileName);
+      var tmpfp = filePath.getParent().getParent().resolve("png");
+      log.debug("temp file path {}", tmpfp);
+      filePath = Paths.get(tmpfp.toString(), fileName.toString()  + type + figName + ".png");
+    }
   }
 
-  public MetaData(Object t, Object f, Object c) {
-    this((String) t, (String) f, (String) c);
+  public MetaData(Map m, Path filePath) {
+    this(getFigure(m), m.get("name"), getCaption(m), filePath);
+  }
+
+  public MetaData(Object t, Object f, Object c, Path filePath) {
+    this((String) t, (String) f, (String) c, filePath, null);
   }
 
   public static String findAttr(Map m, String... opts) {
