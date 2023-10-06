@@ -97,7 +97,6 @@ async def predict():
         record["confidence"]= f"{100 * value.item():.2f}"
         predictions.append(record)
         print(f"{labels[index]:>16s}: {100 * value.item():.2f}%")
-    top_predictions["predictions"] = predictions
     return { 
         'predictions': predictions
     } 

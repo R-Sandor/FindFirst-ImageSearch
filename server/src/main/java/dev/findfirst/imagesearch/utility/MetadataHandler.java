@@ -80,9 +80,15 @@ public class MetadataHandler {
     // Predict the figures types.
     var updatedMetaData =
         this.predictFigures(figureMap.values().stream().filter(md -> md.type().equals("Figure")));
-    updatedMetaData.forEach(newData -> figureMap.put(documentID(jsonPath, newData) , newData));
+    updatedMetaData.forEach(newData -> updateMap(figureMap, newData, jsonPath));
 
     log.info("imageIds {}", figureMap.values());
+  }
+
+  public void updateMap(Map<String, MetaData> figMap, MetaData newMetaData, Path jsonPath) {
+    var documentID = documentID(jsonPath, newMetaData);
+    log.info("documentID {}", documentID);
+    figMap.put(documentID, newMetaData);
   }
 
   /**
@@ -115,10 +121,12 @@ public class MetadataHandler {
     // Example of what an imageId looks like from the database: P14-2074.pdf-Figure1.
     // Split the file name before deep figure.
     final var dbIDPrefix = prefix(jsonPath);
-    log.info("filename {}", jsonPath.toString());
-    log.info("prefix {}", dbIDPrefix);
-
-    return dbIDPrefix + metaData.type() + metaData.figName();
+    log.debug("filename {}", jsonPath.toString());
+    log.debug("prefix {}", dbIDPrefix);
+    log.debug(Paths.get(dbIDPrefix + metaData.type() + metaData.figName())
+        .getFileName().toString());
+    return Paths.get(dbIDPrefix + metaData.type() + metaData.figName())
+        .getFileName().toString();
   }
 
 
@@ -127,5 +135,4 @@ public class MetadataHandler {
     return fileName.toString().split("deepfigures*")[0] + ".pdf-";
   }
 
-  private void predictFigures(List<String> imageIds) {}
 }

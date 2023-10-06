@@ -13,7 +13,6 @@ public record MetaData(
     // canonicaol constructor sets the file path and prediction.
     if (filePath != null) {
       var fileName = filePath.getFileName();
-      log.debug("filename {}", fileName);
       var tmpfp = filePath.getParent().getParent().resolve("png");
       log.debug("temp file path {}", tmpfp);
       filePath = Paths.get(tmpfp.toString(), fileName.toString()  + type + figName + ".png");
@@ -43,4 +42,5 @@ public record MetaData(
   private static String getFigure(Map m) {
     return findAttr(m, "figType", "figure_type");
   }
+
 }
