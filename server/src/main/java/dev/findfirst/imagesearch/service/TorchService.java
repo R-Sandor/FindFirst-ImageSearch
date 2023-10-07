@@ -3,9 +3,8 @@ package dev.findfirst.imagesearch.service;
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
 
 import dev.findfirst.imagesearch.utility.MetaData;
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.Duration;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -59,18 +58,22 @@ public class TorchService {
 
   public Predictions predict(MetaData metaData) {
     WebClient client = WebClient.create(pytorchUrl);
-    log.info("File  {}", metaData.filePath().toString());
-    log.info("File exists {}", metaData.filePath().toFile().exists());
-    var result =
-        client
-            .post() // POST
-            .uri("predict")
-            .contentType(MediaType.MULTIPART_FORM_DATA)
-            .body(fromMultipartData("file", new FileSystemResource(metaData.filePath())))
-            .retrieve()
-            .bodyToMono(Predictions.class);
+    log.info("File  {}", metaData.imagePath().toString());
+    var exists = metaData.imagePath().toFile().exists();
+    log.info("File exists {}", exists);
+    if (exists) {
+      var result =
+          client
+              .post() // POST
+              .uri("predict")
+              .contentType(MediaType.MULTIPART_FORM_DATA)
+              .body(fromMultipartData("file", new FileSystemResource(metaData.imagePath())))
+              .retrieve()
+              .bodyToMono(Predictions.class);
 
-    return result.block(Duration.ofMillis(2000));
+      return result.block(Duration.ofMillis(5000));
+    }
+    return null;
   }
 
   public record EmbeddingVector(double[] image_embeddings) {}

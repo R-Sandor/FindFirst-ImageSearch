@@ -1,12 +1,18 @@
 package dev.findfirst.imagesearch.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import dev.findfirst.imagesearch.model.AcademicImage;
 import dev.findfirst.imagesearch.repository.AcademicImageRepository;
+import dev.findfirst.imagesearch.utility.MetaData;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.StringQuery;
@@ -15,10 +21,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ImageSearchService {
 
   private final AcademicImageRepository imageRepo;
   private final ElasticsearchOperations elasticsearchOperations;
+  private final ElasticsearchClient esClient;
   private final TorchService torch;
 
   public Optional<AcademicImage> findById(String id) {
@@ -71,5 +79,33 @@ public class ImageSearchService {
     return imageTypes.equalsIgnoreCase("png")
         || imageTypes.equalsIgnoreCase("jpeg")
         || imageTypes.equalsIgnoreCase("jpg");
+  }
+
+  public void updateImage(MetaData metaData) throws ElasticsearchException, IOException {
+
+    // TODO: SWITCH TO form image_id to id.
+    // var item = esClient.get(u -> u.index("academic-images").id("vpIWvooBgbuJFaIYUSUD"),
+    // Object.class);
+    // AcademicImage ai = (AcademicImage) item.source();
+    log.debug("updating {}", metaData.documentID());
+    SearchResponse<AcademicImage> response =
+        esClient.search(
+            s ->
+                s.index("academic-images")
+                    .query(q -> q.match(t -> t.field("image_id").query(metaData.documentID()))),
+            AcademicImage.class);
+    var sr = response.hits().hits().get(0); // search response
+    log.debug(sr.id());
+    var foundImage = sr.source();
+    log.debug("predictions: {}", metaData.predictions());
+    foundImage.setPredictions(metaData.predictions());
+    foundImage.setId(metaData.documentID());
+    log.debug("imageID {}", foundImage.getId());
+
+    esClient.update(
+        u -> u.index("academic-images").id(sr.id()).doc(foundImage).upsert(foundImage),
+        AcademicImage.class);
+    // elasticsearchOperations.update(u -> u
+    // .index("products"))
   }
 }
