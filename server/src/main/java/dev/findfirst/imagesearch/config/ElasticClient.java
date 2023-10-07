@@ -75,8 +75,6 @@ public class ElasticClient
     } catch (Exception e) {
       return null;
     }
-
-    // And create the API client
   }
 
   @Bean
