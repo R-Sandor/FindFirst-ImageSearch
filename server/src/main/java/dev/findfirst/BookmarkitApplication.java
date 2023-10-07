@@ -59,7 +59,7 @@ public class BookmarkitApplication implements ApplicationRunner {
     if (args.containsOption("readMetadata")) {
       log.debug("Uploading metadata");
       var path = Paths.get(args.getOptionValues("readMetadata").get(0));
-      metadataHandler.readJSON(path);
+      metadataHandler.updateMetadata(path);
     }
     // TODO Auto-generated method stub
   }

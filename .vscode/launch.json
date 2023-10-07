@@ -7,7 +7,7 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.findfirst.BookmarkitApplication",
             "projectName": "bookmarkit",
-            "args": "--readMetadata=${workspaceFolder}/data/SciFig/metadata/Y02-1005deepfigures-results.json ",
+            "args": "--readMetadata=${workspaceFolder}/data/SciFig/metadata/ ",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
