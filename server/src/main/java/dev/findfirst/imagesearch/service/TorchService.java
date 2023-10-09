@@ -60,7 +60,6 @@ public class TorchService {
     WebClient client = WebClient.create(pytorchUrl);
     log.info("File  {}", metaData.imagePath().toString());
     var exists = metaData.imagePath().toFile().exists();
-    log.info("File exists {}", exists);
     if (exists) {
       var result =
           client

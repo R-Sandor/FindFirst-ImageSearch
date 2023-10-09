@@ -83,7 +83,7 @@ public class ImageSearchService {
 
   public void updateImage(MetaData metaData) throws ElasticsearchException, IOException {
 
-    // TODO: SWITCH TO form image_id to id.
+    // TODO: switch image_id to id.
     // var item = esClient.get(u -> u.index("academic-images").id("vpIWvooBgbuJFaIYUSUD"),
     // Object.class);
     // AcademicImage ai = (AcademicImage) item.source();
@@ -94,6 +94,7 @@ public class ImageSearchService {
                 s.index("academic-images")
                     .query(q -> q.match(t -> t.field("image_id").query(metaData.documentID()))),
             AcademicImage.class);
+
     var sr = response.hits().hits().get(0); // search response
     log.debug(sr.id());
     var foundImage = sr.source();
@@ -103,9 +104,7 @@ public class ImageSearchService {
     log.debug("imageID {}", foundImage.getId());
 
     esClient.update(
-        u -> u.index("academic-images").id(sr.id()).doc(foundImage).upsert(foundImage),
+        u -> u.index("academic-images").id(sr.id()).doc(foundImage).docAsUpsert(true),
         AcademicImage.class);
-    // elasticsearchOperations.update(u -> u
-    // .index("products"))
   }
 }

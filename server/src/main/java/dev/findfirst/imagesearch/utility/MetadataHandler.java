@@ -33,22 +33,9 @@ public class MetadataHandler {
       // Iterate over each JSON file and get the image metadata.
       jsonFiles
           .parallel()
-          .limit(1)
           .forEach(
               jsonPath -> {
-                figureMetaData.putAll(readJSON(jsonPath));
-              });
-
-      figureMetaData.values().stream()
-          .limit(1)
-          .forEach(
-              md -> {
-                try {
-                  imageSearchService.updateImage(md);
-                } catch (ElasticsearchException | IOException e) {
-                  // TODO Auto-generated catch block
-                  e.printStackTrace();
-                }
+                figureMetaData.putAll(readAndSaveJSON(jsonPath));
               });
     } catch (IOException e) {
       // TODO Auto-generated catch block
@@ -56,7 +43,7 @@ public class MetadataHandler {
     }
   }
 
-  public Map<String, MetaData> readJSON(Path p) {
+  public Map<String, MetaData> readAndSaveJSON(Path p) {
     if (p.toFile().exists() && p.toFile().isFile()) {
       log.info("file exists: {}", p.toFile().exists());
       log.info("Reading fom {}", p);
@@ -76,13 +63,15 @@ public class MetadataHandler {
 
         // Used map to handle key collision with merge function.
         var figuresMetada =
-            Stream.of(formattedFigures, rawFigListMap, regionless)
+            Stream.of(formattedFigures, rawFigListMap, regionless).parallel()
                 .flatMap(listOfMap -> listOfMap.stream())
                 .filter(m -> m != null) // Skipping nulls
                 .map(
                     mapEntry -> {
                       return new MetaData(mapEntry, p);
                     })
+                .filter(MetaData::imageExists) // skip any json docs that are missing the associated
+                // image.
                 .collect(
                     Collectors.toMap(
                         MetaData::documentID,
@@ -92,8 +81,19 @@ public class MetadataHandler {
                         }));
 
         this.addPredictionsToMetaData(figuresMetada);
+
+        figuresMetada.values().stream()
+            .forEach(
+                md -> {
+                  try {
+                    imageSearchService.updateImage(md);
+                  } catch (ElasticsearchException | IOException e) {
+                    log.error("Error updating document {}", e.toString());
+                    e.printStackTrace();
+                  }
+                });
         return figuresMetada;
-      } catch (IOException e) {
+      } catch (ElasticsearchException | IOException e) {
         log.error(e.toString());
       }
     }

@@ -25,6 +25,10 @@ public record MetaData(
     imagePath = Paths.get(tmpfp.toString(), documentID + ".png");
   }
 
+  public boolean imageExists() {
+    return this.imagePath.toFile().exists();
+  }
+
   public MetaData(Map m, Path jsonPath) {
     this("", getFigure(m), m.get("name"), getCaption(m), jsonPath, null);
   }
