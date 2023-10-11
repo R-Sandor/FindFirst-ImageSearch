@@ -27,7 +27,7 @@ public class MetadataHandler {
   private final TorchService torch;
   private final ImageSearchService imageSearchService;
 
-  public void updateMetadata(Path jsonMetadDirectory) {
+  public void updateMetadata(Path jsonMetadDirectory, boolean predict) {
     Map<String, MetaData> figureMetaData = new HashMap<>();
     try (var jsonFiles = Files.list(jsonMetadDirectory)) {
       // Iterate over each JSON file and get the image metadata.
@@ -35,7 +35,7 @@ public class MetadataHandler {
           .parallel()
           .forEach(
               jsonPath -> {
-                figureMetaData.putAll(readAndSaveJSON(jsonPath));
+                figureMetaData.putAll(readAndSaveJSON(jsonPath, predict));
               });
     } catch (IOException e) {
       // TODO Auto-generated catch block
@@ -43,7 +43,7 @@ public class MetadataHandler {
     }
   }
 
-  public Map<String, MetaData> readAndSaveJSON(Path p) {
+  public Map<String, MetaData> readAndSaveJSON(Path p, boolean predict) {
     if (p.toFile().exists() && p.toFile().isFile()) {
       log.info("file exists: {}", p.toFile().exists());
       log.info("Reading fom {}", p);
@@ -80,7 +80,9 @@ public class MetadataHandler {
                           return (!x.figName().equals("") && !x.type().equals("")) ? x : y;
                         }));
 
-        this.addPredictionsToMetaData(figuresMetada);
+        if (predict) {
+          this.addPredictionsToMetaData(figuresMetada);
+        }
 
         figuresMetada.values().stream()
             .forEach(

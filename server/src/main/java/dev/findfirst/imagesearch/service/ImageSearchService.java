@@ -101,6 +101,7 @@ public class ImageSearchService {
     log.debug("predictions: {}", metaData.predictions());
     foundImage.setPredictions(metaData.predictions());
     foundImage.setId(metaData.documentID());
+    foundImage.setCaption(metaData.caption());
     log.debug("imageID {}", foundImage.getId());
 
     esClient.update(

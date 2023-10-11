@@ -27,11 +27,13 @@ public class AcademicImage {
   @JsonAlias("image_name")
   private String imageName;
 
+  private String caption;
+
   @Field(name = "relative_path", type = FieldType.Keyword)
   @JsonAlias("relative_path")
   private String relativePath;
 
-  @Field(name = "image_embedding")
+  @Field(name = "image_embedding", type = FieldType.Dense_Vector, similarity = "cosine", index = true)
   @JsonAlias("image_embedding")
   private double[] imageEmbeddings;
 
