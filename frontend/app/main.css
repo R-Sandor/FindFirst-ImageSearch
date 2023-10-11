@@ -15,7 +15,7 @@
 
 .cstyle { 
   width: 30%;
-  height: 500px;
+  height: 650px;
   margin-bottom: 12px;
 }
 
@@ -24,7 +24,7 @@
    background-size: cover;
    background-repeat: no-repeat;
    background-position: center center;
-   max-height: 380px;
+   max-height: 500px;
    /* height: 100%; */
    /* width: 100%; */
 }
