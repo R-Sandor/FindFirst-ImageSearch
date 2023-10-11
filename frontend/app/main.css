@@ -19,12 +19,18 @@
   margin-bottom: 12px;
 }
 
+#text {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 150px;
+}
+
 
 .card-img {
    background-size: cover;
    background-repeat: no-repeat;
    background-position: center center;
-   max-height: 500px;
+   max-height: 400px;
    /* height: 100%; */
    /* width: 100%; */
 }

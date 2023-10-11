@@ -139,7 +139,7 @@ export default function App() {
                 />
                 <div className="card-body">
                   <h5 className="card-title">{card.imageId}</h5>
-                  <p className="card-text">{card.caption}</p>
+                  <p id="text" className="card-text">{card.caption}</p>
                   {/* <a href="#" className="btn btn-primary">
                     Go somewhere
                   </a> */}
