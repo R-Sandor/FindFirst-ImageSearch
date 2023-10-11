@@ -39,12 +39,19 @@ text_inputs = clip.tokenize(tkns).to(device)
 with torch.no_grad():
     text_features = model.encode_text(text_inputs)
 
-def encode_query(query):
-    features = model.encode_text(query)
-    return features
+def encode_image_query(query):
+    features = model.encode_image(query)
+    features /= features.norm(dim=-1, keepdim=True)
+    return features.tolist()[0]
+
+def encode_query(query: str):
+    with torch.no_grad():
+        text_encoded = model.encode_text(clip.tokenize(query).to(device))
+        text_encoded /= text_encoded.norm(dim=-1, keepdim=True)
+        return text_encoded.tolist()[0]
 
 def encodingToJson(encodings): 
-    return {'image_embeddings':  encodings.tolist() }
+    return {'image_embeddings':  encodings }
 
 def nomralizeDP(image_features,  text_embeddings): 
     results = []
@@ -63,13 +70,16 @@ async def search():
         print("file not request.files")
         json = request.get_json()
         search_term = json['query'] 
-        return encodingToJson(encode_query(search_term))
+        encoding = encode_query(search_term)
+
+        return encodingToJson(encoding)
     else:
         file = request.files['file']
         if file.filename == '':
             print("No record")
             return "Record not found", 400
-        return encodingToJson(encode_query(Image.open(file)))
+        image = preprocess(Image.open(file)).unsqueeze(0).to(device) 
+        return encodingToJson(encode_image_query(image))
 
 # This function handles making the confidence level of the categories.
 @app.route('/predict', methods=['POST'])
