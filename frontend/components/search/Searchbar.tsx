@@ -1,23 +1,29 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import { FigureData } from "@/types/Bookmarks/FigureData";
+import { useContext, useState } from "react";
+import Filepicker from "@/components/search/Filepicker";
 import api from "@/api/Api";
+import { SearchResultsContext } from "@/contexts/SearchContext";
 
+function SearchBar() {
+  const [searchText, setSearch] = useState<string>("");
+  const searchResults = useContext(SearchResultsContext);
 
-
-function SearchBar({ searchResults, setCardData }: { searchResults: FigureData[], setCardData:  Dispatch<SetStateAction<FigureData[]>>}) {
-  const[searchText, setSearch] = useState<string>("");
   function handleChange(e: any) {
     setSearch(e.target.value);
-    console.log(e.target.value);
   }
-  
+
   function searchNow() {
-    console.log("searching now")
+    console.log("searching: ", searchText);
     api.ImageSearchText(searchText).then((response) => {
-      searchResults = response.data;
-      setCardData(searchResults)
-      console.log(searchResults)
-    })
+      searchResults.setSearchData(response.data);
+    });
+    console.log(searchResults.searchData);
+  }
+
+  function onKeyDown(e: any) {
+    const { keyCode } = e;
+    if (keyCode == 13) {
+      searchNow();
+    }
   }
 
   return (
@@ -25,21 +31,26 @@ function SearchBar({ searchResults, setCardData }: { searchResults: FigureData[]
       <div className="input-group">
         <input
           type="search"
-          className="form-control rounded"
+          className="form-control"
           placeholder="Describe your figure!"
           aria-label="Search"
           aria-describedby="search-addon"
           onChange={handleChange}
+          onKeyDown={onKeyDown}
           value={searchText}
-          
         />
-        <button
-          type="button"
-          onClick={() => searchNow()}
-          className="btn btn-outline-primary"
-        >
-          search
-        </button>
+        <div className="input-group-append">
+          <button className="camera-btn btn btn-outline-secondary">
+            <Filepicker setSearch={setSearch} />
+          </button>
+          <button
+            type="button"
+            onClick={() => searchNow()}
+            className="search-btn btn btn-outline-secondary"
+          >
+            search
+          </button>
+        </div>
       </div>
     </div>
   );

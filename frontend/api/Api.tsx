@@ -1,5 +1,6 @@
 import { NewBookmarkRequest } from "@/components/bookmark/NewBookmarkCard";
 import axios from "axios";
+import { FileContent } from "use-file-picker/dist/interfaces";
 const SERVER_URL = "http://localhost:9000/api";
 
 const instance = axios.create({
@@ -88,7 +89,14 @@ const api = {
     return this.execute("DELETE", "bookmarks/" + id, null, {});
   },
   ImageSearchText(searchText: string) {
-    return instance.post("imagesearch/text", null, { params: { text: searchText } });
+    return instance.post("imagesearch/text", null, {
+      params: { text: searchText },
+    });
+  },
+  ImageSearchImage(file: File) {
+    return instance.postForm("imagesearch/image", {
+      image: file, // FileList will be unwrapped as sepate fields
+    });
   },
 };
 

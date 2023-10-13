@@ -68,6 +68,9 @@ dependencies:
   typescript:
     specifier: 5.1.6
     version: 5.1.6
+  use-file-picker:
+    specifier: ^2.1.0
+    version: 2.1.0(react@18.2.0)
 
 devDependencies:
   babel-preset-env:
@@ -2216,6 +2219,13 @@ packages:
     engines: {node: ^10.12.0 || >=12.0.0}
     dependencies:
       flat-cache: 3.0.4
+    dev: false
+
+  /file-selector@0.2.4:
+    resolution: {integrity: sha512-ZDsQNbrv6qRi1YTDOEWzf5J2KjZ9KMI1Q2SGeTkCJmNNW25Jg4TW4UMcmoqcg4WrAyKRcpBXdbWRxkfrOzVRbA==}
+    engines: {node: '>= 10'}
+    dependencies:
+      tslib: 2.6.0
     dev: false
 
   /fill-range@7.0.1:
@@ -4421,6 +4431,16 @@ packages:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
     dependencies:
       punycode: 2.3.0
+    dev: false
+
+  /use-file-picker@2.1.0(react@18.2.0):
+    resolution: {integrity: sha512-nZDYyB3wagpbuhCVPNH6ceyok9TGytw7waJV8v80eu5ykEj89uBTv3CyrBd0I1N1m2cBJgKCpVNOjZT0GDrb+Q==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      file-selector: 0.2.4
+      react: 18.2.0
     dev: false
 
   /util-deprecate@1.0.2:

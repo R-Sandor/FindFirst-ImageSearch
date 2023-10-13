@@ -1,14 +1,13 @@
 "use client";
 import "./main.css";
 import SearchBar from "@/components/search/Searchbar";
-import UseAuth from "@components/UseAuth";
 import { Badge } from "react-bootstrap";
+import { Predictions, FigureData } from "@/types/Bookmarks/FigureData";
+import { useContext } from "react";
 import {
-  Predictions,
-  Prediction,
-  FigureData,
-} from "@/types/Bookmarks/FigureData";
-import { useEffect, useState } from "react";
+  SearchResultProvider,
+  SearchResultsContext,
+} from "@/contexts/SearchContext";
 const IMAGE_DIR = process.env.IMAGE_DIR;
 
 function imagePath(path: string): string {
@@ -34,7 +33,7 @@ function makeBadge(predictions: Predictions): JSX.Element {
   // if it is a table just return the one prediction, we know it's a table from the metadata.
   let confidenceStlye: string[] = [];
   if (predictions.predictions[0].label === "Table") {
-    confidenceStlye.push("badge-primary")
+    confidenceStlye.push("badge-primary");
     return (
       <Badge>
         {" "}
@@ -44,14 +43,14 @@ function makeBadge(predictions: Predictions): JSX.Element {
     );
   }
   predictions.predictions.forEach((prediction) => {
-    if (parseFloat(prediction.confidence) > 80)  {
-      confidenceStlye.push("bg-primary")
+    if (parseFloat(prediction.confidence) > 80) {
+      confidenceStlye.push("bg-primary");
     } else if (parseFloat(prediction.confidence) > 50) {
-      confidenceStlye.push("bg-warning")
+      confidenceStlye.push("bg-warning");
     } else {
-      confidenceStlye.push("bg-secondary")
+      confidenceStlye.push("bg-secondary");
     }
-  })
+  });
 
   return (
     <div>
@@ -72,7 +71,6 @@ function makeBadge(predictions: Predictions): JSX.Element {
 }
 
 export default function App() {
-  const userAuth = UseAuth();
   const catagories = [
     "Algorithms",
     "Architecture Diagram",
@@ -95,63 +93,72 @@ export default function App() {
     "Word Cloud",
   ];
 
-  const [cardData, setCardData] = useState<FigureData[]>([]);
-
-  useEffect(() => {
-    console.log(cardData);
-  }, [cardData]);
-
   return (
-    <div className="row">
+    <SearchResultProvider>
       <div className="row">
-        <SearchBar setCardData={setCardData} searchResults={cardData} />
-      </div>
-      <div className="col-2">
-        <div className="ml-6 features">
-          Figure Types:
-          {catagories.map((val, i) => {
-            return (
-              <div key={i} className="form-check">
-                <input
-                  className="ml-3 form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="flexCheckChecked"
-                />
-                <label className="form-check-label" htmlFor="flexCheckChecked">
-                  {val}
-                </label>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      <div className="col-9">
         <div className="row">
-          {cardData.map((card, i) => {
-            console.log(card);
-            return (
-              <div key={i} className="card mr-10 cstyle">
-                <img
-                  className="card-img"
-                  src={imagePath(card.relativePath)}
-                  alt="Card image cap"
-                />
-                <div className="card-body">
-                  <h5 className="card-title">{card.imageId}</h5>
-                  <p id="text" className="card-text">{card.caption}</p>
-                  {/* <a href="#" className="btn btn-primary">
+          <SearchBar />
+        </div>
+        <div className="col-2">
+          <div className="ml-6 features">
+            Figure Types:
+            {catagories.map((val, i) => {
+              return (
+                <div key={i} className="form-check">
+                  <input
+                    className="ml-3 form-check-input"
+                    type="checkbox"
+                    value=""
+                    id="flexCheckChecked"
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="flexCheckChecked"
+                  >
+                    {val}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <MainSearchResults/>
+      </div>
+    </SearchResultProvider>
+  );
+}
+
+function MainSearchResults() {
+  const searchResults = useContext(SearchResultsContext);
+  console.log(searchResults.searchData)
+  return (
+    <div className="col-9">
+          <div className="row">
+            {searchResults.searchData.map((card, i) => {
+              console.log(card);
+              return (
+                <div key={i} className="card mr-10 cstyle">
+                  <img
+                    className="card-img"
+                    src={imagePath(card.relativePath)}
+                    alt="Card image cap"
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title">{card.imageId}</h5>
+                    <p id="text" className="card-text">
+                      {card.caption}
+                    </p>
+                    {/* <a href="#" className="btn btn-primary">
                     Go somewhere
                   </a> */}
+                  </div>
+                  <div className="card-footer text-muted">
+                    {makeBadge(card.predictions)}
+                  </div>
                 </div>
-                <div className="card-footer text-muted">
-                  {makeBadge(card.predictions)}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+              );
+            })}
+          </div>
     </div>
   );
 }
