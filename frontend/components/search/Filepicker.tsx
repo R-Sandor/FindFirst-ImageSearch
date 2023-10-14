@@ -10,8 +10,10 @@ import {
   ImageDimensionsValidator,
 } from "use-file-picker/validators";
 
-export default function FilePicker(pickerProp: {setSearch:Dispatch<SetStateAction<string>>}) {
-  const searchResults  = useContext(SearchResultsContext);
+export default function FilePicker(pickerProp: {
+  setSearch: Dispatch<SetStateAction<string>>;
+}) {
+  const searchResults = useContext(SearchResultsContext);
   const { openFilePicker, filesContent, loading, errors } = useFilePicker({
     readAs: "DataURL",
     accept: "image/*",
@@ -28,31 +30,31 @@ export default function FilePicker(pickerProp: {setSearch:Dispatch<SetStateActio
     ],
     onFilesSuccessfullySelected: ({ plainFiles, filesContent }) => {
       // this callback is called when there were no validation errors
-      pickerProp.setSearch(plainFiles[0].name)
+      pickerProp.setSearch(plainFiles[0].name);
       api.ImageSearchImage(plainFiles[0]).then((response) => {
-          searchResults.setSearchData(response.data)
+        searchResults.setSearchData(response.data);
       });
     },
   });
-
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (errors.length) {
-    {console.log(errors)}
+    {
+      console.log(errors);
+    }
     return <div>Error...</div>;
   }
   if (filesContent) {
   }
   return (
-    <div>
-      <i
-        className="bi bi-camera "
-        onClick={() => openFilePicker()}
-      ></i>
-      <br />
-    </div>
+    <button
+      className="btn camera-btn btn-outline-secondary"
+      onClick={() => openFilePicker()}
+    >
+      <i className="bi bi-camera "></i>
+    </button>
   );
 }

@@ -40,9 +40,7 @@ function SearchBar() {
           value={searchText}
         />
         <div className="input-group-append">
-          <button className="camera-btn btn btn-outline-secondary">
-            <Filepicker setSearch={setSearch} />
-          </button>
+          <Filepicker setSearch={setSearch} />
           <button
             type="button"
             onClick={() => searchNow()}
