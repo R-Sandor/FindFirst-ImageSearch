@@ -19,10 +19,6 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 public class AcademicImage {
   @Id private String id;
 
-  @Field(name = "image_id", type = FieldType.Keyword)
-  @JsonAlias("image_id")
-  private String imageId;
-
   @Field(name = "image_name", type = FieldType.Keyword)
   @JsonAlias("image_name")
   private String imageName;
@@ -33,11 +29,14 @@ public class AcademicImage {
   @JsonAlias("relative_path")
   private String relativePath;
 
-  @Field(name = "image_embedding", type = FieldType.Dense_Vector, similarity = "cosine", index = true)
+  @Field(
+      name = "image_embedding",
+      type = FieldType.Dense_Vector,
+      similarity = "cosine",
+      index = true)
   @JsonAlias("image_embedding")
   private double[] imageEmbeddings;
 
   @Field(name = "predictions", type = FieldType.Object)
-  @JsonAlias("predictions")
   private Predictions predictions;
 }

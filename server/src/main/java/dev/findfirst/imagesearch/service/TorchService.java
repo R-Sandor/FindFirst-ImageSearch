@@ -64,7 +64,7 @@ public class TorchService {
       var result =
           client
               .post() // POST
-              .uri("predict")
+              .uri("predictimage")
               .contentType(MediaType.MULTIPART_FORM_DATA)
               .body(fromMultipartData("file", new FileSystemResource(metaData.imagePath())))
               .retrieve()
@@ -79,5 +79,9 @@ public class TorchService {
 
   public record Predictions(Prediction[] predictions) {}
 
-  public record Prediction(String label, String confidence) {}
+  public record Prediction(String label, Double confidence) {
+    public Prediction(String label, String confidence) {
+      this(label, Double.parseDouble(confidence));
+    }
+  }
 }

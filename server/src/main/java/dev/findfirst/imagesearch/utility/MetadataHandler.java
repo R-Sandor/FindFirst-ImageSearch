@@ -5,12 +5,15 @@ import dev.findfirst.imagesearch.service.ImageSearchService;
 import dev.findfirst.imagesearch.service.TorchService;
 import dev.findfirst.imagesearch.service.TorchService.Prediction;
 import dev.findfirst.imagesearch.service.TorchService.Predictions;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,14 +32,22 @@ public class MetadataHandler {
 
   public void updateMetadata(Path jsonMetadDirectory, boolean predict) {
     Map<String, MetaData> figureMetaData = new HashMap<>();
+
     try (var jsonFiles = Files.list(jsonMetadDirectory)) {
+      var total = Files.list(jsonMetadDirectory).count();
       // Iterate over each JSON file and get the image metadata.
+      AtomicInteger fileCount = new AtomicInteger(0);
+      var start = System.currentTimeMillis();
       jsonFiles
           .parallel()
           .forEach(
               jsonPath -> {
                 figureMetaData.putAll(readAndSaveJSON(jsonPath, predict));
+                var c = fileCount.incrementAndGet();
+                log.debug("\nPrecent Read: {}%, Read {} \n",  c/total, c);
               });
+      var end = System.currentTimeMillis();
+      log.info("Runntime {}", end - start);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -63,7 +74,8 @@ public class MetadataHandler {
 
         // Used map to handle key collision with merge function.
         var figuresMetada =
-            Stream.of(formattedFigures, rawFigListMap, regionless).parallel()
+            Stream.of(formattedFigures, rawFigListMap, regionless)
+                .parallel()
                 .flatMap(listOfMap -> listOfMap.stream())
                 .filter(m -> m != null) // Skipping nulls
                 .map(

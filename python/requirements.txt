@@ -1,7 +1,10 @@
+# required by '.env' and '.flaskenv' files
+python-dotenv~=0.21.1
 flask==2.0.2
 flask[async]
 flask-cors
 flask-wtf==1.0.1
+flask-sock
 Pillow~=9.3.0
 # sentence-transformers~=2.2.2
 tqdm~=4.64.1

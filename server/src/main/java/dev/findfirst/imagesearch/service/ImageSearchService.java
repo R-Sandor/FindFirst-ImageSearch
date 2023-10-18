@@ -2,7 +2,6 @@ package dev.findfirst.imagesearch.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import dev.findfirst.imagesearch.model.AcademicImage;
 import dev.findfirst.imagesearch.repository.AcademicImageRepository;
 import dev.findfirst.imagesearch.utility.MetaData;
@@ -30,7 +29,7 @@ public class ImageSearchService {
   private final TorchService torch;
 
   public Optional<AcademicImage> findById(String id) {
-    return imageRepo.findByImageId(id);
+    return imageRepo.findById(id);
   }
 
   public List<AcademicImage> findByQuery(String text, int k) {
@@ -83,29 +82,38 @@ public class ImageSearchService {
 
   public void updateImage(MetaData metaData) throws ElasticsearchException, IOException {
 
-    // TODO: switch image_id to id.
-    // var item = esClient.get(u -> u.index("academic-images").id("vpIWvooBgbuJFaIYUSUD"),
-    // Object.class);
-    // AcademicImage ai = (AcademicImage) item.source();
-    log.debug("updating {}", metaData.documentID());
-    SearchResponse<AcademicImage> response =
-        esClient.search(
-            s ->
-                s.index("academic-images")
-                    .query(q -> q.match(t -> t.field("image_id").query(metaData.documentID()))),
-            AcademicImage.class);
+    AcademicImage ai =
+        new AcademicImage(
+            metaData.documentID(),
+            metaData.documentID(),
+            metaData.caption(),
+            metaData.imagePath().toString(),
+            null,
+            metaData.predictions());
 
-    var sr = response.hits().hits().get(0); // search response
-    log.debug(sr.id());
-    var foundImage = sr.source();
-    log.debug("predictions: {}", metaData.predictions());
-    foundImage.setPredictions(metaData.predictions());
-    foundImage.setId(metaData.documentID());
-    foundImage.setCaption(metaData.caption());
-    log.debug("imageID {}", foundImage.getId());
+    esClient.index(i -> i.index("academic-images").id(ai.getId()).document(ai));
 
-    esClient.update(
-        u -> u.index("academic-images").id(sr.id()).doc(foundImage).docAsUpsert(true),
-        AcademicImage.class);
+    // // TODO: switch image_id to id.
+    // var ai = esClient.get(u -> u.index("academic-images").id(metaData.documentID()),
+    // AcademicImage.class).source();
+    // // AcademicImage ai = (AcademicImage) item.source();
+    // log.debug("updating {}", metaData.documentID());
+    // // SearchResponse<AcademicImage> response =
+    // //     esClient.search(
+    // //         s ->
+    // //             s.index("academic-images")
+    // //                 .query(q -> q.match(t ->
+    // t.field("image_id").query(metaData.documentID()))),
+    // //         AcademicImage.class);
+    // log.debug("predictions: {}", metaData.predictions());
+    // ai.setPredictions(metaData.predictions());
+    // ai.setId(metaData.documentID());
+    // ai.setCaption(metaData.caption());
+    // log.debug("imageID {}", ai.getId());
+
+    // esClient.update(
+    //     u -> u.index("academic-images").id(ai.getId())
+    //     .doc(ai).docAsUpsert(true),
+    //     AcademicImage.class);
   }
 }

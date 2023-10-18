@@ -50,6 +50,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework:spring-websocket:6.0.13'
+	implementation 'org.springframework:spring-messaging:6.0.13'
 	implementation 'org.springframework.security:spring-security-config:6.0.1'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.1'

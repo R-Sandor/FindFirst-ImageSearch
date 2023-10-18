@@ -1,9 +1,12 @@
-from flask import Flask, request 
+import sys
+sys.path.append('../')
+from flask import Flask, request
 from flask_cors import cross_origin
 from PIL import Image
-import numpy as np
 import torch
 import clip
+import numpy 
+from TorchUtil import encode_image_query, encode_query, encodingToJson
 import json
 
 app = Flask(__name__)
@@ -39,30 +42,6 @@ text_inputs = clip.tokenize(tkns).to(device)
 with torch.no_grad():
     text_features = model.encode_text(text_inputs)
 
-def encode_image_query(query):
-    features = model.encode_image(query)
-    features /= features.norm(dim=-1, keepdim=True)
-    return features.tolist()[0]
-
-def encode_query(query: str):
-    with torch.no_grad():
-        text_encoded = model.encode_text(clip.tokenize(query).to(device))
-        text_encoded /= text_encoded.norm(dim=-1, keepdim=True)
-        return text_encoded.tolist()[0]
-
-def encodingToJson(encodings): 
-    return {'image_embeddings':  encodings }
-
-def nomralizeDP(image_features,  text_embeddings): 
-    results = []
-    v1 = np.array(image_features)
-    # Norm of the matrix
-    v1 = v1 / np.linalg.norm(image_features)  # normalized
-    for v2 in np.array(text_embeddings):
-        results.append(np.dot(v1, (v2 / np.linalg.norm(text_embeddings))))
-    return results
-
-
 @app.route('/', methods=['GET', 'POST'])
 async def search():
     # do image search
@@ -82,8 +61,8 @@ async def search():
         return encodingToJson(encode_image_query(image))
 
 # This function handles making the confidence level of the categories.
-@app.route('/predict', methods=['POST'])
-async def predict():
+@app.route('/predictimage', methods=['POST'])
+async def predict_image():
     file = request.files['file']
     if file.filename == '':
         print("No record")
@@ -104,9 +83,39 @@ async def predict():
     for value, index in zip(values, indices):
         record = {}
         record["label"] = labels[index]
-        record["confidence"]= f"{100 * value.item():.2f}"
+        record["confidence"]= round(100 * value.item(),2)
         predictions.append(record)
         print(f"{labels[index]:>16s}: {100 * value.item():.2f}%")
     return { 
-        'predictions': predictions
+        "predictions": predictions
+    } 
+
+
+# This function handles making the confidence level of the categories.
+@app.route('/predictembedding', methods=['POST'])
+## TODO: Not sure if the embbedings can be used
+async def predict_embedding():
+    json = request.get_json()
+    image_features = json['imageEmbedding']
+    print(image_features)
+    with torch.no_grad():
+        text_features = model.encode_text(text_inputs)
+        # Pick the top 3 most similar labels for the image
+    image_features = numpy.asarray(image_features)    
+    image_features = torch.Tensor(image_features).float().to(device)
+    text_features /= text_features.norm(dim=-1, keepdim=True)
+    similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
+    values, indices = similarity[0].topk(3)
+
+    # Print the result
+    print("\nTop predictions:\n")
+    predictions = []
+    for value, index in zip(values, indices):
+        record = {}
+        record["label"] = labels[index]
+        record["confidence"]= round(100 * value.item(),2)
+        predictions.append(record)
+        print(f"{labels[index]:>16s}: {100 * value.item():.2f}%")
+    return { 
+        predictions
     } 

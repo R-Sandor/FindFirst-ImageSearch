@@ -24,14 +24,14 @@
 
 .cstyle { 
   width: 30%;
-  height: 650px;
+  height: 690px;
   margin-bottom: 12px;
 }
 
 #text {
     overflow-y: scroll;
     overflow-x: hidden;
-    max-height: 150px;
+    max-height: 120px;
 }
 
 

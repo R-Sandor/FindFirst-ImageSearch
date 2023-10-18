@@ -2,12 +2,28 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ImageClassification",
+            "request": "launch",
+            "mainClass": "dev.findfirst.pytorch.ImageClassification",
+            "projectName": "bookmarkit"
+        },
+        {
+            "type": "java",
+            "name": "ImageTextComparison",
+            "request": "launch",
+            "mainClass": "dev.findfirst.pytorch.ImageTextComparison",
+            "projectName": "bookmarkit",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=43329 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=bookmarkit"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-BookmarkitApplication<bookmarkit>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.findfirst.BookmarkitApplication",
             "projectName": "bookmarkit",
-            // "args": "--readMetadata=${workspaceFolder}/data/SciFig/metadata/ ",
+            // "args": "--readMetadata=${workspaceFolder}/data/SciFig/metadata/ --predict",
+            "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/ --predict",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
