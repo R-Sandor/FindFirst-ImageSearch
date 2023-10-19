@@ -2,6 +2,7 @@ package dev.findfirst.imagesearch.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch.core.UpdateRequest;
 import dev.findfirst.imagesearch.model.AcademicImage;
 import dev.findfirst.imagesearch.repository.AcademicImageRepository;
 import dev.findfirst.imagesearch.utility.MetaData;
@@ -62,7 +63,7 @@ public class ImageSearchService {
                   "match_all": {}
               },
               "script": {
-                "source": "cosineSimilarity(params.queryVector, 'image_embedding')+1.0",
+                "source": "cosineSimilarity(params.queryVector, 'embedding')+1.0",
                 "params": { "queryVector": %s }
                 }
               }
@@ -81,39 +82,16 @@ public class ImageSearchService {
   }
 
   public void updateImage(MetaData metaData) throws ElasticsearchException, IOException {
+   var ai = esClient.get(u -> u.index("academic-images").id(metaData.documentID()),
+    AcademicImage.class).source();
+    ai.setCaption(metaData.caption());
+    ai.setPredictions(metaData.predictions());
+    ai.setImagename(metaData.documentID());
+    ai.setId(metaData.documentID());
 
-    AcademicImage ai =
-        new AcademicImage(
-            metaData.documentID(),
-            metaData.documentID(),
-            metaData.caption(),
-            metaData.imagePath().toString(),
-            null,
-            metaData.predictions());
-
-    esClient.index(i -> i.index("academic-images").id(ai.getId()).document(ai));
-
-    // // TODO: switch image_id to id.
-    // var ai = esClient.get(u -> u.index("academic-images").id(metaData.documentID()),
-    // AcademicImage.class).source();
-    // // AcademicImage ai = (AcademicImage) item.source();
-    // log.debug("updating {}", metaData.documentID());
-    // // SearchResponse<AcademicImage> response =
-    // //     esClient.search(
-    // //         s ->
-    // //             s.index("academic-images")
-    // //                 .query(q -> q.match(t ->
-    // t.field("image_id").query(metaData.documentID()))),
-    // //         AcademicImage.class);
-    // log.debug("predictions: {}", metaData.predictions());
-    // ai.setPredictions(metaData.predictions());
-    // ai.setId(metaData.documentID());
-    // ai.setCaption(metaData.caption());
-    // log.debug("imageID {}", ai.getId());
-
-    // esClient.update(
-    //     u -> u.index("academic-images").id(ai.getId())
-    //     .doc(ai).docAsUpsert(true),
-    //     AcademicImage.class);
+    esClient.update(
+        u -> u.index("academic-images").id(metaData.documentID())
+        .doc(ai),
+        AcademicImage.class);
   }
 }

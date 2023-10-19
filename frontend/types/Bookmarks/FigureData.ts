@@ -1,8 +1,8 @@
 export interface FigureData {
-  imageId: string;
+  imagename: string;
   caption: string;
   predictions: Predictions;
-  relativePath: string;
+  path: string;
   figure: string;
 }
 export interface Predictions {

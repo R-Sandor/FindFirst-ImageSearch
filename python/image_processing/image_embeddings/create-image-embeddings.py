@@ -2,16 +2,13 @@
 # Starting template.
 import os
 import sys
-sys.path.append('../../')
-from TorchUtil import predict_image_file
 import glob
 import time
 import json
 import argparse
+from sentence_transformers import SentenceTransformer
 from elasticsearch import Elasticsearch, SSLError
 from elasticsearch.helpers import parallel_bulk
-import torch
-import clip
 from PIL import Image
 from tqdm import tqdm
 from datetime import datetime
@@ -20,25 +17,20 @@ from exif import Image as exifImage
 ES_HOST = "https://127.0.0.1:9200/"
 ES_USER = "elastic"
 ES_PASSWORD = "changeme"
-ES_TIMEOUT = 6000 
+ES_TIMEOUT = 3600
 
 DEST_INDEX = "academic-images"
 DELETE_EXISTING = True
 CHUNK_SIZE = 100
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device)
 # Sample set
 #PATH_TO_IMAGES = "../../frontend/public/*.png"
 #PREFIX="../../frontend/public/"
 
-# FULL DAT SET
-# PATH_TO_IMAGES = "../../../data/SciFig/**/*.png" 
-# PREFIX = "../../../data/SciFig/png/"
+PATH_TO_IMAGES = "../../../data/SciFig-pilot/png/*.png" 
 
-# Pilot data
-PATH_TO_IMAGES =    "../../../data/SciFig-pilot/png/**/*.png" # Testing 
-PREFIX =            "../../../data/SciFig-pilot/png/"
+PREFIX = "../../../data/SciFig-pilot/png/"
+
 CA_CERT='../../../conf/ca.crt'
 
 parser = argparse.ArgumentParser()
@@ -74,20 +66,20 @@ def main():
     lst = []
 
     start_time = time.perf_counter()
-    img_model = model
+    img_model = SentenceTransformer('clip-ViT-B-32')
     duration = time.perf_counter() - start_time
     print(f'Duration load model = {duration}')
+
     filenames = glob.glob(PATH_TO_IMAGES, recursive=True)
     start_time = time.perf_counter()
     for filename in tqdm(filenames, desc='Processing files', total=len(filenames)):
-        image = preprocess(Image.open(filename)).unsqueeze(0).to(device)
+        image = Image.open(filename)
+
         doc = {}
         embedding = image_embedding(image, img_model)
         doc['_id'] = create_image_id(filename)
-        doc['imageName'] = os.path.basename(filename)
-        doc['imageEmbedding'] = embedding.tolist()
-        doc['relativePath'] = os.path.relpath(filename).split(PREFIX)[1]
-        # doc['predictions'] = predict_image_file(image)
+        doc['embedding'] = embedding.tolist()
+        doc['path'] = os.path.relpath(filename).split(PREFIX)[1]
 
         lst.append(doc)
 
@@ -128,11 +120,12 @@ def main():
                               ignore=[400, 404],
                               request_timeout=args.timeout)
 
+
         count = 0
         for success, info in parallel_bulk(
                 client=es,
                 actions=lst,
-                thread_count=10,
+                thread_count=4,
                 chunk_size=args.chunk_size,
                 timeout='%ss' % 120,
                 index=index
@@ -158,7 +151,7 @@ def main():
 
 
 def image_embedding(image, model):
-    return model.encode_image(image).to(device)
+    return model.encode(image)
 
 
 def create_image_id(filename):

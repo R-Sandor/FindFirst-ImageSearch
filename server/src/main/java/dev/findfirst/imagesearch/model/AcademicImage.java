@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.Similarity;
 
 @Document(indexName = "academic-images")
 @AllArgsConstructor
@@ -17,25 +18,23 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AcademicImage {
+
   @Id private String id;
 
-  @Field(name = "image_name", type = FieldType.Keyword)
-  @JsonAlias("image_name")
-  private String imageName;
+  // @Field(name = "image_name", type = FieldType.Keyword)
+  // @JsonAlias("image_name")
+  // private String imageName;
 
   private String caption;
 
-  @Field(name = "relative_path", type = FieldType.Keyword)
-  @JsonAlias("relative_path")
-  private String relativePath;
+  private String imagename;
 
   @Field(
-      name = "image_embedding",
+      name = "embedding",
       type = FieldType.Dense_Vector,
-      similarity = "cosine",
+      similarity = Similarity.BM25,
       index = true)
-  @JsonAlias("image_embedding")
-  private double[] imageEmbeddings;
+  private double[] embedding;
 
   @Field(name = "predictions", type = FieldType.Object)
   private Predictions predictions;

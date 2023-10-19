@@ -5,23 +5,14 @@
   },
   "mappings": {
     "properties": {
-      "image_embedding": {
+      "embedding": {
         "type": "dense_vector",
         "dims": 512,
         "index": true,
         "similarity": "cosine"
       },
-      "_id": {
-        "type": "keyword"
-      },
-      "imageName": {
+      "path" : {
         "type" : "keyword"
-      },
-      "relative_path" : {
-        "type" : "keyword"
-      },
-      "predictons": {
-        "type": "object"
       }
     }
   }
