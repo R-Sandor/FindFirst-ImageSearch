@@ -44,7 +44,7 @@ public class MetadataHandler {
               jsonPath -> {
                 figureMetaData.putAll(readAndSaveJSON(jsonPath, predict));
                 var c = fileCount.incrementAndGet();
-                log.debug("\nPrecent Read: {}%, Read {} \n",  c/total, c);
+                log.debug("\nPrecent Read: {}%, Read {} \n", (double) c/total * 100, c);
               });
       var end = System.currentTimeMillis();
       log.info("Runntime {}", end - start);

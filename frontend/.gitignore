@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 public/png
+public/pilot-png
 
 # testing
 /coverage

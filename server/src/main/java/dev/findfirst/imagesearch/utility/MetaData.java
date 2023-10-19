@@ -19,7 +19,7 @@ public record MetaData(
     // canonicaol constructor sets the file path and prediction.
     var fileName = jsonPath.getFileName();
     var tmpfp = jsonPath.getParent().getParent().resolve("png");
-    log.debug("temp file path {}", tmpfp);
+    // log.debug("temp file path {}", tmpfp);
     documentID = makeDocID(fileName, type, figName);
     log.debug(documentID);
     imagePath = Paths.get(tmpfp.toString(), documentID + ".png");

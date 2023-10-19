@@ -22,8 +22,10 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.findfirst.BookmarkitApplication",
             "projectName": "bookmarkit",
-            // "args": "--readMetadata=${workspaceFolder}/data/SciFig/metadata/ --predict",
-            "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/ --predict",
+            // Production
+            // "args": "--readMetadata=${workspaceFolder}/data/SciFig/metadata/",
+            // pilot data
+            // "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/ --predict",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
