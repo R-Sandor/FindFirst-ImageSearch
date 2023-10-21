@@ -2,7 +2,7 @@
 import "./main.css";
 import SearchBar from "@/components/search/Searchbar";
 import { Badge } from "react-bootstrap";
-import { Predictions, FigureData } from "@/types/Bookmarks/FigureData";
+import { FigureData, Prediction } from "@/types/Bookmarks/FigureData";
 import { useContext } from "react";
 import {
   SearchResultProvider,
@@ -30,20 +30,20 @@ function cleanLabel(label: string) {
   }
 }
 
-function makeBadge(predictions: Predictions): JSX.Element {
+function makeBadge(predictions: Prediction[]): JSX.Element {
   // if it is a table just return the one prediction, we know it's a table from the metadata.
   let confidenceStlye: string[] = [];
-  if (predictions.predictions[0].label === "Table") {
+  if (predictions[0].label === "Table") {
     confidenceStlye.push("badge-primary");
     return (
       <Badge>
         {" "}
-        {predictions.predictions[0].label}:
-        {predictions.predictions[0].confidence}%
+        {predictions[0].label}:
+        {predictions[0].confidence}%
       </Badge>
     );
   }
-  predictions.predictions.forEach((prediction) => {
+  predictions.forEach((prediction: Prediction) => {
     if (parseFloat(prediction.confidence) > 80) {
       confidenceStlye.push("bg-primary");
     } else if (parseFloat(prediction.confidence) > 50) {
@@ -56,16 +56,16 @@ function makeBadge(predictions: Predictions): JSX.Element {
   return (
     <div>
       <Badge className={"mr-3 " + confidenceStlye[0]}>
-        {cleanLabel(predictions.predictions[0].label)}:
-        {predictions.predictions[0].confidence}%
+        {cleanLabel(predictions[0].label)}:
+        {predictions[0].confidence}%
       </Badge>
       <Badge className={"mr-3 " + confidenceStlye[1]}>
-        {cleanLabel(predictions.predictions[1].label)}:
-        {predictions.predictions[1].confidence}%
+        {cleanLabel(predictions[1].label)}:
+        {predictions[1].confidence}%
       </Badge>
       <Badge className={"mr-3 " + confidenceStlye[2]}>
-        {cleanLabel(predictions.predictions[2].label)}:
-        {predictions.predictions[2].confidence}%
+        {cleanLabel(predictions[2].label)}:
+        {predictions[2].confidence}%
       </Badge>
     </div>
   );

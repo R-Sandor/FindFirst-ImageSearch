@@ -5,8 +5,6 @@ import dev.findfirst.imagesearch.service.ImageSearchService;
 import dev.findfirst.imagesearch.service.TorchService;
 import dev.findfirst.imagesearch.service.TorchService.Prediction;
 import dev.findfirst.imagesearch.service.TorchService.Predictions;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +30,12 @@ public class MetadataHandler {
 
   public void updateMetadata(Path jsonMetadDirectory, boolean predict) {
     Map<String, MetaData> figureMetaData = new HashMap<>();
+    // try (var os =  new PrintWriter(Paths.get("data/metadataJson").toFile())) {
+    // } catch (IOException e) {
+    //   // TODO Auto-generated catch block
+    //   log.debug("error writing to file {}", e);
+    //   e.printStackTrace();
+    // }
 
     try (var jsonFiles = Files.list(jsonMetadDirectory)) {
       var total = Files.list(jsonMetadDirectory).count();
@@ -44,7 +48,7 @@ public class MetadataHandler {
               jsonPath -> {
                 figureMetaData.putAll(readAndSaveJSON(jsonPath, predict));
                 var c = fileCount.incrementAndGet();
-                log.debug("\nPrecent Read: {}%, Read {} \n", (double) c/total * 100, c);
+                log.debug("\nPrecent Read: {}%, Read {} \n", (double) c / total * 100, c);
               });
       var end = System.currentTimeMillis();
       log.info("Runntime {}", end - start);
@@ -56,8 +60,8 @@ public class MetadataHandler {
 
   public Map<String, MetaData> readAndSaveJSON(Path p, boolean predict) {
     if (p.toFile().exists() && p.toFile().isFile()) {
-      log.info("file exists: {}", p.toFile().exists());
-      log.info("Reading fom {}", p);
+      // log.debug("file exists: {}", p.toFile().exists());
+      log.info("Reading fom {}", p.toFile().getName());
       try {
         // We know that the file size is adequate and do not need to use lazy list.
         var map = new JacksonJsonParser().parseMap(Files.readString(p));

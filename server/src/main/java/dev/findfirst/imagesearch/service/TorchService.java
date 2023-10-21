@@ -58,7 +58,7 @@ public class TorchService {
 
   public Predictions predict(MetaData metaData) {
     WebClient client = WebClient.create(pytorchUrl);
-    log.info("File  {}", metaData.imagePath().toString());
+    log.info("File  {}", metaData.imagePath().getFileName());
     var exists = metaData.imagePath().toFile().exists();
     if (exists) {
       var result =

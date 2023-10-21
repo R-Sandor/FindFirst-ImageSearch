@@ -1,12 +1,9 @@
 export interface FigureData {
   imagename: string;
   caption: string;
-  predictions: Predictions;
+  predictions: Prediction[];
   path: string;
   figure: string;
-}
-export interface Predictions {
-  predictions: Prediction[]
 }
 
 export interface Prediction { 
