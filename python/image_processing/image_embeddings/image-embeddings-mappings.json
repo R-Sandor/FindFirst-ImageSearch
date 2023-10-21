@@ -13,6 +13,17 @@
       },
       "path" : {
         "type" : "keyword"
+      },
+      "predictions": {
+        "type": "nested",
+        "properties": {
+          "confidence": {
+            "type":"float"
+          },
+          "label": {
+            "type": "keyword"
+          }
+        }
       }
     }
   }
