@@ -5,14 +5,41 @@
   },
   "mappings": {
     "properties": {
+      "id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "imagename": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "caption": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "path": {
+        "type": "keyword"
+      },
       "embedding": {
         "type": "dense_vector",
         "dims": 512,
         "index": true,
         "similarity": "cosine"
-      },
-      "path": {
-        "type": "keyword"
       },
       "predictions": {
         "type": "nested",
