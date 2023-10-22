@@ -51,7 +51,7 @@ public class ImageSearchController {
   public ResponseEntity<List<AcademicImage>> classSearch(@RequestParam("class") String imageClass) {
     try {
       return new Response<List<AcademicImage>>(
-              imageService.findTopResultsforImageClass(imageClass), HttpStatus.OK)
+              imageService.findTopResultsforImageClass(imageClass, 10), HttpStatus.OK)
           .get();
     } catch (ElasticsearchException | IOException e) {
       log.error("error while querying for {}, error: {}", imageClass, e);

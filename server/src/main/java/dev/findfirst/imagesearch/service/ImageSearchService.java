@@ -1,5 +1,10 @@
 package dev.findfirst.imagesearch.service;
-
+import static dev.findfirst.imagesearch.service.queries.ImageQueries.ACADEMIC_IMAGES;
+import static dev.findfirst.imagesearch.service.queries.ImageQueries.PREDS;
+import static dev.findfirst.imagesearch.service.queries.ImageQueries.PREDS_CONF;
+import static dev.findfirst.imagesearch.service.queries.ImageQueries.PREDS_LBL;
+import static dev.findfirst.imagesearch.service.queries.ImageQueries.byPredictionType;
+import static dev.findfirst.imagesearch.service.queries.ImageQueries.sortByConfidence;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.SortMode;
@@ -33,10 +38,6 @@ public class ImageSearchService {
   private final ElasticsearchOperations elasticsearchOperations;
   private final ElasticsearchClient esClient;
   private final TorchService torch;
-  private final String ACADEMIC_IMAGES = "academic-images";
-  private final String PREDS = "predictions";
-  private final String PREDS_LBL = "predictions.label";
-  private final String PREDS_CONF = "predictions.confidence";
 
   public Optional<AcademicImage> findById(String id) {
     return imageRepo.findById(id);
@@ -49,42 +50,31 @@ public class ImageSearchService {
         .collect(Collectors.toList());
   }
 
-  // Return the top results of a given category
-  public List<AcademicImage> findTopResultsforImageClass(String imageClass)
+  /**
+   * Finds the top results for a classification
+   * @param imageClass (i.e. graph, scatter plot, box chart, etc)
+   * @return List of Academic-Figures
+   * @throws ElasticsearchException error if elastic search is down.
+   * @throws IOException error if deserialization fails etc.
+   */
+  public List<AcademicImage> findTopResultsforImageClass(String imageClass, int k)
       throws ElasticsearchException, IOException {
 
-    // spotless:off
-    Query byPredictionsType = MatchQuery.of(m -> m 
-      .field(PREDS_LBL)
-      .query(imageClass)
-    )._toQuery();
-
-    SortOptions sortByConfidence = SortOptions.of(ns -> ns 
-      .field(f -> f
-        .field(PREDS_CONF)
-        .mode(SortMode.Min)
-        .order(SortOrder.Desc)
-        .nested(nf -> nf 
-          .path(PREDS)
-          .filter(fq -> fq 
-            .term(t -> t 
-              .field(PREDS_LBL)
-              .value(imageClass))))));
-
+    // spotless:off 
     SearchResponse<AcademicImage> response = esClient.search(s -> s 
     .index(ACADEMIC_IMAGES)
     .query(q -> q
-      .nested( nq -> nq
+      .nested( nestedQuery -> nestedQuery
         .path(PREDS)
         .query(pq -> pq 
           .bool(b -> b
-            .must(byPredictionsType))))
+            .must(byPredictionType(imageClass)))))
     )
-    .sort(sortByConfidence),AcademicImage.class);
+    .sort(sortByConfidence(imageClass)),AcademicImage.class);
     // spotless:on
 
     var aiHits = response.hits().hits();
-    return aiHits.stream().limit(10).map(aih -> aih.source()).toList();
+    return aiHits.stream().limit(k).map(aih -> aih.source()).toList();
   }
 
   // Return the top results for a given query with query
