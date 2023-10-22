@@ -11,14 +11,14 @@
         "index": true,
         "similarity": "cosine"
       },
-      "path" : {
-        "type" : "keyword"
+      "path": {
+        "type": "keyword"
       },
       "predictions": {
         "type": "nested",
         "properties": {
           "confidence": {
-            "type":"float"
+            "type": "float"
           },
           "label": {
             "type": "keyword"

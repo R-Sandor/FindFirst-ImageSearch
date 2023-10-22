@@ -11,6 +11,7 @@ image_processing/__pycache__
 data/**
 bckups/*.tar
 **/__pycache__/*
+.VSCodeCounter
 
 .venv
 # Log file
