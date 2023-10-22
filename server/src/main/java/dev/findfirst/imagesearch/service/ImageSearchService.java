@@ -43,7 +43,7 @@ public class ImageSearchService {
   }
 
   public List<AcademicImage> findByQuery(String text, int k) {
-    return createQuery(torch.getEmbeddings(text)).stream()
+    return query(torch.getEmbeddings(text)).stream()
         .limit(k)
         .map(sh -> sh.getContent())
         .collect(Collectors.toList());
@@ -91,20 +91,29 @@ public class ImageSearchService {
 
   // multiple categories
 
-  // Used documentation from https://spring.io/guides/gs/uploading-files/
+  /**
+   * Finds a similar image. First calls Pytorch to get the vector then passes that to the query.
+   *
+   * @param file Image file
+   * @param k number of figures to return (10 is default)
+   * @return List of Academic-Images.
+   * @throws Exception
+   * @see https://spring.io/guides/gs/uploading-files/ for how to upload files. Used to produce
+   *     function.
+   */
   public List<AcademicImage> findSimilarImages(MultipartFile file, int k) throws Exception {
     String type = file.getContentType();
     if (file.isEmpty() || !isImage(type)) {
       throw new Exception("Empty file or Wrong type.");
     }
 
-    return createQuery(torch.getEmbeddings(file)).stream()
+    return query(torch.getEmbeddings(file)).stream() // search results
         .limit(k)
-        .map(sh -> sh.getContent())
+        .map(searchHits -> searchHits.getContent())
         .collect(Collectors.toList());
   }
 
-  private SearchHits<AcademicImage> createQuery(double[] embedding) {
+  private SearchHits<AcademicImage> query(double[] embedding) {
     var query =
         new StringQuery(
             """
@@ -137,12 +146,7 @@ public class ImageSearchService {
         esClient
             .get(u -> u.index("academic-images").id(metaData.documentID()), AcademicImage.class)
             .source();
-    ai.setCaption(metaData.caption());
-    log.debug("{}", metaData.predictions().predictions());
-    ai.setPredictions(metaData.predictions().predictions());
-    ai.setImagename(metaData.documentID());
-    ai.setId(metaData.documentID());
-
+    ai.setMetadata(metaData);
     esClient.update(
         u -> u.index("academic-images").id(metaData.documentID()).doc(ai), AcademicImage.class);
   }

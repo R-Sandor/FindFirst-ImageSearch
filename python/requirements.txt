@@ -2,11 +2,12 @@
 python-dotenv~=0.21.1
 flask==2.0.2
 flask[async]
+elasticsearch[async]
 flask-cors
 flask-wtf==1.0.1
-flask-sock
 Pillow~=9.3.0
 # sentence-transformers~=2.2.2
+sentence-transformers
 tqdm~=4.64.1
 WerkZeug==2.2.2
 git+https://github.com/openai/CLIP.git

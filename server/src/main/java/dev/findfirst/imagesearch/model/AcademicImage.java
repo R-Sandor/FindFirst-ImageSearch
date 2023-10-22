@@ -2,6 +2,7 @@ package dev.findfirst.imagesearch.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import dev.findfirst.imagesearch.service.TorchService.Prediction;
+import dev.findfirst.imagesearch.utility.MetaData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +20,11 @@ public class AcademicImage {
 
   @Id private String id;
 
-  // @Field(name = "image_name", type = FieldType.Keyword)
-  // @JsonAlias("image_name")
-  // private String imageName;
+  public void setMetadata(MetaData metaData) {
+    this.id = metaData.documentID();
+    this.caption = metaData.caption();
+    this.predictions = metaData.predictions().predictions();
+  }
 
   private String caption;
 

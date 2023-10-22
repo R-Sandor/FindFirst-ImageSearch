@@ -1,11 +1,12 @@
 package dev.findfirst.imagesearch.controller;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import dev.findfirst.bookmarkit.utility.Response;
 import dev.findfirst.imagesearch.model.AcademicImage;
 import dev.findfirst.imagesearch.service.ImageSearchService;
-
 import java.io.IOException;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-
 @RestController
 @RequestMapping("/api/imagesearch")
+@Slf4j
 public class ImageSearchController {
 
   @Autowired ImageSearchService imageService;
@@ -35,17 +35,6 @@ public class ImageSearchController {
         .get();
   }
 
-  @GetMapping("/class")
-  public ResponseEntity<List<AcademicImage>> classSearch(@RequestParam("class") String imageClass) {
-    try {
-      return new Response<List<AcademicImage>>(imageService.findTopResultsforImageClass(imageClass), HttpStatus.OK).get();
-    } catch (ElasticsearchException | IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      return new Response<List<AcademicImage>>(null, HttpStatus.BAD_REQUEST).get();
-    }
-  }
-
   @PostMapping("/image")
   public ResponseEntity<List<AcademicImage>> handleFileUpload(
       @RequestParam("image") MultipartFile file) {
@@ -55,6 +44,18 @@ public class ImageSearchController {
           .get();
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @GetMapping("/class")
+  public ResponseEntity<List<AcademicImage>> classSearch(@RequestParam("class") String imageClass) {
+    try {
+      return new Response<List<AcademicImage>>(
+              imageService.findTopResultsforImageClass(imageClass), HttpStatus.OK)
+          .get();
+    } catch (ElasticsearchException | IOException e) {
+      log.error("error while querying for {}, error: {}", imageClass, e);
+      return new Response<List<AcademicImage>>(null, HttpStatus.BAD_REQUEST).get();
     }
   }
 }
