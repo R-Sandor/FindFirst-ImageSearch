@@ -1,17 +1,10 @@
 package dev.findfirst.imagesearch.service;
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.ACADEMIC_IMAGES;
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.PREDS;
-import static dev.findfirst.imagesearch.service.queries.ImageQueries.PREDS_CONF;
-import static dev.findfirst.imagesearch.service.queries.ImageQueries.PREDS_LBL;
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.byPredictionType;
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.sortByConfidence;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.SortMode;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import dev.findfirst.imagesearch.model.AcademicImage;
 import dev.findfirst.imagesearch.repository.AcademicImageRepository;

@@ -30,6 +30,8 @@ public class AcademicImage {
 
   private String imagename;
 
+  private String path;
+
   @Field(name = "embedding", type = FieldType.Dense_Vector, similarity = "cosine", index = true)
   private double[] embedding;
 
