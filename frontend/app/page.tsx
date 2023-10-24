@@ -12,7 +12,8 @@ const IMAGE_DIR = process.env.IMAGE_DIR;
 
 function imagePath(path: string): string {
   // use the specified directory or default
-  path = path + ".png"
+  console.log(path)
+  // path = path + ".png"
   return IMAGE_DIR != (undefined || null)
     ? IMAGE_DIR + "/" + path
     : "png/" + path;
@@ -141,11 +142,11 @@ function MainSearchResults() {
                 <div key={i} className="card mr-10 cstyle">
                   <img
                     className="card-img"
-                    src={imagePath(card.imagename)}
+                    src={imagePath(card.path)}
                     alt="Card image cap"
                   />
                   <div className="card-body">
-                    <h5 className="card-title">{card.imagename}</h5>
+                    <h5 className="card-title">{card.path}</h5>
                     <p id="text" className="card-text">
                       {card.caption}
                     </p>
