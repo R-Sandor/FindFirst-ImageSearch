@@ -2,8 +2,8 @@
 import "./main.css";
 import SearchBar from "@/components/search/Searchbar";
 import { Badge } from "react-bootstrap";
-import { FigureData, Prediction } from "@/types/Bookmarks/FigureData";
-import { useContext } from "react";
+import { Prediction } from "@/types/Bookmarks/FigureData";
+import { useContext, useState } from "react";
 import {
   SearchResultProvider,
   SearchResultsContext,
@@ -73,7 +73,7 @@ function makeBadge(predictions: Prediction[]): JSX.Element {
 }
 
 export default function App() {
-  const catagories = [
+const catagories = [
     "Algorithms",
     "Architecture Diagram",
     "Bar charts",
@@ -94,6 +94,21 @@ export default function App() {
     "Venn Diagram",
     "Word Cloud",
   ];
+  const [checkedState, setCheckedState] = useState(
+    new Array(catagories.length).fill(false)
+  );
+
+  const handleOnChange = (position: number) => {
+    console.log(position)
+    setCheckedState(checkedState.map((item, index) =>
+      index === position ? !item : item
+    ));
+    console.log(checkedState)
+    
+    console.log(checkedState)
+    console.log(checkedState)
+  }
+  
 
   return (
     <SearchResultProvider>
@@ -112,6 +127,7 @@ export default function App() {
                     type="checkbox"
                     value=""
                     id="flexCheckChecked"
+                    onChange={() => handleOnChange(i)}
                   />
                   <label
                     className="form-check-label"

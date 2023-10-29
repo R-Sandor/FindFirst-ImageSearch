@@ -25,7 +25,7 @@
             // Production
             // "args": "--readMetadata=${workspaceFolder}/data/SciFig/metadata/",
             // pilot data
-            // "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/ --predict",
+            "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/ --predict",
             "envFile": "${workspaceFolder}/.env"
         }
     ]

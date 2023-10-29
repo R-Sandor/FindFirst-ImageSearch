@@ -1,6 +1,5 @@
 import { NewBookmarkRequest } from "@/components/bookmark/NewBookmarkCard";
 import axios from "axios";
-import { FileContent } from "use-file-picker/dist/interfaces";
 const SERVER_URL = "http://localhost:9000/api";
 
 const instance = axios.create({
@@ -97,6 +96,9 @@ const api = {
     return instance.postForm("imagesearch/image", {
       image: file, // FileList will be unwrapped as sepate fields
     });
+  },
+  ImageSearchClassification(classification: string) {
+    return this.execute("GET", "imagesearch/class", null, {});
   },
 };
 
