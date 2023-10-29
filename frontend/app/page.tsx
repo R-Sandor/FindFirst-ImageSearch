@@ -150,9 +150,6 @@ function MainSearchResults() {
                     <p id="text" className="card-text">
                       {card.caption}
                     </p>
-                    {/* <a href="#" className="btn btn-primary">
-                    Go somewhere
-                  </a> */}
                   </div>
                   <div className="card-footer text-muted">
                     {makeBadge(card.predictions)}

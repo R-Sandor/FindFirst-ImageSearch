@@ -1,8 +1,10 @@
 package dev.findfirst.imagesearch.service;
+
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.ACADEMIC_IMAGES;
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.PREDS;
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.byPredictionType;
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.sortByConfidence;
+
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -44,7 +46,8 @@ public class ImageSearchService {
   }
 
   /**
-   * Finds the top results for a classification
+   * Finds the top results for a classification.
+   *
    * @param imageClass (i.e. graph, scatter plot, box chart, etc)
    * @return List of Academic-Figures
    * @throws ElasticsearchException error if elastic search is down.
