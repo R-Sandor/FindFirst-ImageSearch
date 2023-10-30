@@ -3,7 +3,7 @@ import Filepicker from "@/components/search/Filepicker";
 import api from "@/api/Api";
 import { SearchResultsContext } from "@/contexts/SearchContext";
 
-function SearchBar() {
+function SearchBar({ classifications }: { classifications: string[] }) {
   const [searchText, setSearch] = useState<string>("");
   const searchResults = useContext(SearchResultsContext);
 
@@ -16,13 +16,26 @@ function SearchBar() {
     api.ImageSearchText(searchText).then((response) => {
       searchResults.setSearchData(response.data);
     });
-    console.log(searchResults.searchData);
+    // console.log(searchResults.searchData);
+  }
+
+  function searchByClasses(classifications: string[]) {
+    console.log("searching: ", searchText);
+    api.ImageSearchClassification(searchText).then((response) => {
+      searchResults.setSearchData(response.data);
+    });
+    // console.log(searchResults.searchData);
   }
 
   function onKeyDown(e: any) {
     const { keyCode } = e;
     if (keyCode == 13) {
-      searchNow();
+      if (searchText.trim() == "" && classifications) {
+        console.log("Searching By Class")
+        searchByClasses(classifications)
+      }
+      else if (searchText.trim() != "")
+        searchNow();
     }
   }
 

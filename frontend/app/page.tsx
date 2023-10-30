@@ -3,12 +3,33 @@ import "./main.css";
 import SearchBar from "@/components/search/Searchbar";
 import { Badge } from "react-bootstrap";
 import { Prediction } from "@/types/Bookmarks/FigureData";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   SearchResultProvider,
   SearchResultsContext,
 } from "@/contexts/SearchContext";
 const IMAGE_DIR = process.env.IMAGE_DIR;
+const catagories = [
+    "Algorithms",
+    "Architecture Diagram",
+    "Bar charts",
+    "Box Plots",
+    "Confusion Matrix",
+    "Graph",
+    "Line Graph Chart",
+    "Geographical Maps",
+    "Natural Images",
+    "Neural Networks",
+    "NLP text grammar",
+    "Pareto",
+    "Pie chart",
+    "Scatter Plot",
+    "Screenshots",
+    "Tables",
+    "Trees",
+    "Venn Diagram",
+    "Word Cloud",
+  ];
 
 function imagePath(path: string): string {
   // use the specified directory or default
@@ -73,40 +94,39 @@ function makeBadge(predictions: Prediction[]): JSX.Element {
 }
 
 export default function App() {
-const catagories = [
-    "Algorithms",
-    "Architecture Diagram",
-    "Bar charts",
-    "Box Plots",
-    "Confusion Matrix",
-    "Graph",
-    "Line Graph Chart",
-    "Geographical Maps",
-    "Natural Images",
-    "Neural Networks",
-    "NLP text grammar",
-    "Pareto",
-    "Pie chart",
-    "Scatter Plot",
-    "Screenshots",
-    "Tables",
-    "Trees",
-    "Venn Diagram",
-    "Word Cloud",
-  ];
   const [checkedState, setCheckedState] = useState(
-    new Array(catagories.length).fill(false)
-  );
+    new Array(catagories.length).fill(false));
+  const [checkedLbl,setCheckedLbl] = useState<string[]>([])
+  function classSearch() {
+    return checkedState.flatMap((v, i) => { 
+      console.log(v)
+      if (v == true ) {
+        console.log(i)
+        return i;
+      }
+      return []
+    })
+  }
+
+  useEffect(() => {
+    console.log(checkedState)
+  }, [checkedState])
 
   const handleOnChange = (position: number) => {
     console.log(position)
     setCheckedState(checkedState.map((item, index) =>
       index === position ? !item : item
-    ));
-    console.log(checkedState)
-    
-    console.log(checkedState)
-    console.log(checkedState)
+    ))
+    let lbls = checkedState.flatMap((v, i) => { 
+      console.log(v)
+      if (v == true ) {
+        console.log(i)
+        return catagories[i];
+      }
+      return []
+    })
+    setCheckedLbl(lbls)
+    console.log(checkedLbl)
   }
   
 
@@ -114,7 +134,7 @@ const catagories = [
     <SearchResultProvider>
       <div className="row">
         <div className="row">
-          <SearchBar />
+          <SearchBar classifications={checkedLbl}/>
         </div>
         <div className="col-2">
           <div className="ml-6 features">
@@ -148,12 +168,12 @@ const catagories = [
 
 function MainSearchResults() {
   const searchResults = useContext(SearchResultsContext);
-  console.log(searchResults.searchData)
+  // console.log(searchResults.searchData)
   return (
     <div className="col-9">
           <div className="row">
             {searchResults.searchData.map((card, i) => {
-              console.log(card);
+              // console.log(card);
               return (
                 <div key={i} className="card mr-10 cstyle">
                   <img
