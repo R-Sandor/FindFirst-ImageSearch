@@ -165,12 +165,12 @@ export default function App() {
                     className="ml-3 form-check-input"
                     type="checkbox"
                     value=""
-                    id="flexCheckChecked"
+                    id={`flexCheckChecked-${i}`}
                     onChange={() => handleOnChange(i)}
                   />
                   <label
                     className="form-check-label"
-                    htmlFor="flexCheckChecked"
+                    htmlFor={`flexCheckChecked-${i}`}
                   >
                     {val}
                   </label>
