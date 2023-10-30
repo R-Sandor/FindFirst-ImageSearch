@@ -48,7 +48,7 @@ public class ImageSearchController {
   }
 
   @GetMapping("/class")
-  public ResponseEntity<List<AcademicImage>> classSearch(@RequestParam("class") String imageClass) {
+  public ResponseEntity<List<AcademicImage>> classSearch(@RequestParam("classification") String imageClass) {
     try {
       return new Response<List<AcademicImage>>(
               imageService.findTopResultsforImageClass(imageClass, 10), HttpStatus.OK)

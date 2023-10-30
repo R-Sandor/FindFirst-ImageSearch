@@ -20,18 +20,20 @@ function SearchBar({ classifications }: { classifications: string[] }) {
   }
 
   function searchByClasses(classifications: string[]) {
-    console.log("searching: ", searchText);
-    api.ImageSearchClassification(searchText).then((response) => {
+    console.log("searching by class: ", classifications );
+    api.ImageSearchClassification(classifications[0]).then((response) => {
       searchResults.setSearchData(response.data);
-    });
-    // console.log(searchResults.searchData);
+    })
   }
+ 
 
   function onKeyDown(e: any) {
     const { keyCode } = e;
     if (keyCode == 13) {
+      console.log(classifications)
       if (searchText.trim() == "" && classifications) {
         console.log("Searching By Class")
+        console.log(classifications)
         searchByClasses(classifications)
       }
       else if (searchText.trim() != "")

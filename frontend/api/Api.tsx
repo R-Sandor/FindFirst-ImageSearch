@@ -1,5 +1,6 @@
 import { NewBookmarkRequest } from "@/components/bookmark/NewBookmarkCard";
 import axios from "axios";
+
 const SERVER_URL = "http://localhost:9000/api";
 
 const instance = axios.create({
@@ -64,7 +65,6 @@ const api = {
   },
   addAllTag(strTags: string[]) {
     let t = JSON.stringify(strTags);
-    console.log(t);
     return this.execute("POST", "tags/addTags", strTags, {});
   },
   getTagById(id: string) {
@@ -97,8 +97,13 @@ const api = {
       image: file, // FileList will be unwrapped as sepate fields
     });
   },
-  ImageSearchClassification(classification: string) {
-    return this.execute("GET", "imagesearch/class", null, {});
+  ImageSearchClassification(classLbls: string) {
+    console.log("api call", classLbls)
+    return instance.get("imagesearch/class", {
+      params: {
+        classification: classLbls.toLowerCase().trim(),
+      },
+    });
   },
 };
 
