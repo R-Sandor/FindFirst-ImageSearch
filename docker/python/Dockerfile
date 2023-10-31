@@ -21,7 +21,7 @@ RUN pip install python-dotenv~=0.21.1
 RUN pip install exif==1.5.0
 
 COPY ./requirements.txt /app/requirements.txt
-RUN pip install -Ur requirements.txt
+RUN pip install -r requirements.txt
 
 FROM python:3.9.18 as runner
 WORKDIR /app/
@@ -32,4 +32,4 @@ COPY . /app
 EXPOSE 5000
 ENV FLASK_ENV="development"
 ENV FLASK_APP=server.py
-ENTRYPOINT [ "./runflask.sh" ]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

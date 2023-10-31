@@ -34,65 +34,22 @@ Once the cluster is up and running, let's get the CA certificate out from the El
 ```bash
 $ # still in the folder "es-docker"
 $ docker cp image-search-86-es01-1://usr/share/elasticsearch/config/certs/ca/ca.crt conf/ca.crt
+$ docker compose down 
 ```
 
-
-### 2. Load NLP models - PREMIUM SERVICE...
-This method does not work for users of the basic license. The strategy then was to use a microservice 
-that would use the sentenceTransformers used in the image_embedding scripts. 
-See pytorch_server.
-
-The Flask microservice returns the image embedding. 
-
-
-Let's load the NLP model into the application. You will use the `eland` client to load the models. For more details, follow the [documentation](https://www.elastic.co/guide/en/elasticsearch/client/eland/current/index.html).
-
-Go **back** in to the main project directory and import the model using Eland docker image.
-```bash
-$ cd ../
-# wait until each model is loaded and started. If you do not have enough memory, you will see errors sometimes confusing
-$ eland_import_hub_model --url https://elastic:changeme@127.0.0.1:9200 --hub-model-id sentence-transformers/clip-ViT-B-32-multilingual-v1 --task-type text_embedding --start --ca-certs conf/ca.crt
-```
-For ESS cloud Elasticsearch deployment use bundled CA certificate.
-```bash
-$ eland_import_hub_model --url https://elastic:<password>@URL:443 --hub-model-id sentence-transformers/clip-ViT-B-32-multilingual-v1 --task-type text_embedding --start --ca-certs app/conf/ess-cloud.cer
-```
-
-Example output:
-```bash
-eland_import_hub_model --url https://elastic:changeme@127.0.0.1:9200 --hub-model-id sentence-transformers/clip-ViT-B-32-multilingual-v1 --task-type text_embedding --start --ca-certs app/conf/ca.crt
-2022-12-12 13:40:52,308 INFO : Establishing connection to Elasticsearch
-2022-12-12 13:40:52,327 INFO : Connected to cluster named 'image-search-8.6.0' (version: 8.6.0)
-2022-12-12 13:40:52,328 INFO : Loading HuggingFace transformer tokenizer and model 'sentence-transformers/clip-ViT-B-32-multilingual-v1'
-/Users/rado/pmm_workspace/ml-nlp-demo/flask-elastic-image-search/.venv/lib/python3.9/site-packages/transformers/models/distilbert/modeling_distilbert.py:217: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.
-  mask, torch.tensor(torch.finfo(scores.dtype).min)
-2022-12-12 13:41:03,032 INFO : Creating model with id 'sentence-transformers__clip-vit-b-32-multilingual-v1'
-2022-12-12 13:41:03,050 INFO : Uploading model definition
-100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 129/129 [00:42<00:00,  3.01 parts/s]
-2022-12-12 13:41:45,902 INFO : Uploading model vocabulary
-2022-12-12 13:41:46,120 INFO : Starting model deployment
-2022-12-12 13:41:52,825 INFO : Model successfully imported with id 'sentence-transformers__clip-vit-b-32-multilingual-v1'
-```
-
-![](docs/img/models.png)
-
-If you see on the screen that some models are missing and you see a message `ML job and trained model synchronization required`, go ahead and click the link to synchronize models.
-
-![](docs/img/model-sync.png)
-
-### 3. Generate image embeddings
+### 2. Generate image embeddings
 Your next step is to generate the image embeddings from your photos. These embeddings will be used for kNN (vector) search in Elasticsearch.
 
-**Put all your photos in to the folder `image_processing/data` ** . 
+**Put all your photos in to the folder `{workspaceFolder}/data` ** . 
 
 **Notes**:
 - you can use sub-folders to maintain sane structure for your images
-- only jp(e)g file types were tested
+- only png file types were tested
 - you need to have hundreds of photos to get best results. If you have only a dozen of them, then vector search in the space you create is minimal, and distances between images (vectors) are very similar.
 
 ```bash
-$ cd image_embeddings
+$ cd python/image_embeddings/image_processing
 $ python3 create-image-embeddings.py --es_host='https://127.0.0.1:9200' \
   --es_user='elastic' --es_password='changeme' \
-  --ca_certs='../conf/ca.crt'
+  --ca_certs='../../../conf/ca.crt'
 ```

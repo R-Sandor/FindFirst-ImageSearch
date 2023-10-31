@@ -5,17 +5,25 @@ services:
       dockerfile: ../docker/frontend/Dockerfile
       context: ./frontend
     ports: 
-     - "8080:8080"
+     - 3000:3000
     volumes:
-      - nfs-data/SciFig/png/:/public/images
-    environment:
-      - IMAGE_DIR=images
+      - type: bind
+        source: ./data
+        target: /app/public/png
+    # environment:
+    #   - IMAGE_DIR=images
   backend:
     build: 
       dockerfile: ../docker/server/Dockerfile
       context: ./server
     ports: 
      - "9000:9000"
+  pytorch:
+    build:
+      dockerfile: ../../docker/python/Dockerfile
+      context: ./python/pytorch_server
+    ports:
+      - 5000:5000
   db: 
     image: postgres:15.4
     environment:
@@ -24,10 +32,3 @@ services:
       - POSTGRES_PASSWORD=admin
     ports:
       - 5432:5432
-  volumes:
-    nfs-data:
-      driver: local
-      driver_opts: 
-      type: nfs
-      o: nfsvers=4, addr=10.0.0.1, rw
-      device: ":data"
