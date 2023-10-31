@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Filepicker from "@/components/search/Filepicker";
 import api from "@/api/Api";
 import { SearchResultsContext } from "@/contexts/SearchContext";
@@ -11,33 +11,37 @@ function SearchBar({ classifications }: { classifications: string[] }) {
     setSearch(e.target.value);
   }
 
+  useEffect(() => {
+    if (classifications.length > 0) {
+      searchNow()
+    }
+  }, [classifications]);
+
   function searchNow() {
-    console.log("searching: ", searchText);
-    api.ImageSearchText(searchText).then((response) => {
-      searchResults.setSearchData(response.data);
-    });
-    // console.log(searchResults.searchData);
+    if (searchText.trim() == "" && classifications) {
+      console.log("Searching By Class")
+      console.log(classifications)
+      searchByClasses()
+    }
+    else if (searchText.trim() != "") {
+      api.ImageSearchText(searchText).then((response) => {
+        searchResults.setSearchData(response.data);
+      });
+    }
   }
 
-  function searchByClasses(classifications: string[]) {
-    console.log("searching by class: ", classifications );
+  function searchByClasses() {
+    console.log("searching by class: ", classifications);
     api.ImageSearchClassification(classifications[0]).then((response) => {
       searchResults.setSearchData(response.data);
     })
   }
- 
+
 
   function onKeyDown(e: any) {
     const { keyCode } = e;
     if (keyCode == 13) {
-      console.log(classifications)
-      if (searchText.trim() == "" && classifications) {
-        console.log("Searching By Class")
-        console.log(classifications)
-        searchByClasses(classifications)
-      }
-      else if (searchText.trim() != "")
-        searchNow();
+      searchNow();
     }
   }
 
