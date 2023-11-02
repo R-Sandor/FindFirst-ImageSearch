@@ -6,6 +6,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.net.ssl.SSLContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
+@Slf4j
 @EnableElasticsearchRepositories(basePackages = "dev.findfirst.imagesearch.repository")
 public class ElasticClient
 // extends ElasticsearchConfiguration
@@ -30,10 +32,12 @@ public class ElasticClient
 
   @Value("${elastic.password}") String password;
 
+  @Value("${elastic.host}") String hostname;
+
   @Bean
   public RestClient restClient() {
     try {
-
+      log.info("username: {}, password: {}", username, password);
       // TODO: Should be on the dev profile to run this on self-signed TLS server.
       final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
       credentialsProvider.setCredentials(
@@ -44,7 +48,7 @@ public class ElasticClient
       final SSLContext sslContext = sslBuilder.build();
 
       RestClientBuilder builder =
-          RestClient.builder(new HttpHost("localhost", 9200, "https"))
+          RestClient.builder(new HttpHost(hostname, 9200, "https"))
               .setRequestConfigCallback(
                   requestConfigBuilder ->
                       requestConfigBuilder.setConnectTimeout(5000).setSocketTimeout(60000))

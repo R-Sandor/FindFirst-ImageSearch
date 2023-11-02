@@ -8,8 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Document(indexName = "academic-images")
 @AllArgsConstructor
@@ -32,9 +30,7 @@ public class AcademicImage {
 
   private String path;
 
-  @Field(name = "embedding", type = FieldType.Dense_Vector, similarity = "cosine", index = true)
   private double[] embedding;
 
-  // @Field(name = "predictions", type = FieldType.Nested)
   private Prediction predictions[];
 }
