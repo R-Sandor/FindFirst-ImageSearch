@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class TorchService {
 
-  @Value("${microservice.pytorch.url:http://localhost:5000/}") private String pytorchUrl;
+  @Value("${pytorch.url:http://localhost:5000/}") private String pytorchUrl;
 
   public double[] getEmbeddings(String text) {
     WebClient client =
