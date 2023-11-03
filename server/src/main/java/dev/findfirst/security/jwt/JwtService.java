@@ -17,8 +17,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.security.interfaces.RSAPrivateKey;
 import java.time.Instant;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -30,7 +28,6 @@ import org.springframework.web.util.WebUtils;
 
 @Service
 public class JwtService {
-  private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
   @Value("${jwt.private.key}") private RSAPrivateKey priv;
 
@@ -82,7 +79,7 @@ public class JwtService {
   public String generateTokenFromUser(User user) {
     Instant now = Instant.now();
     String email = user.getEmail();
-    Integer roleId = user.getRole().getId();
+    Long roleId = user.getRole().getId();
     String roleName = user.getRole().getName().name();
     Integer tenantId = user.getTenantId();
     JwtClaimsSet claims =
