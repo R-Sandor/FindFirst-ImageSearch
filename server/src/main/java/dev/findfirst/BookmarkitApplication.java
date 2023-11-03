@@ -37,13 +37,16 @@ public class BookmarkitApplication implements ApplicationRunner {
     // Local host and 127.0.0.1 are the same
     config.setAllowedOrigins(
         Arrays.asList(
+            "http://localhost",
             "https://localhost:3000",
             "http://localhost:3000",
-            "https://devfindfirst.dev:3000",
             "http://localhost:8080",
+            "http://127.0.0.1:3000",
             "http://127.0.0.1:8080",
-            "http://localhost",
-            "http://127.0.0.1"));
+            "https://devfindfirst.dev:3000",
+            "http://frontend",
+            "http://frontend:3000",
+            "https://frontend:3000"));
     config.setAllowedMethods(Collections.singletonList("*"));
     config.setAllowedHeaders(Collections.singletonList("*"));
     source.registerCorsConfiguration("/**", config);
@@ -59,7 +62,7 @@ public class BookmarkitApplication implements ApplicationRunner {
     if (args.containsOption("readMetadata")) {
       log.debug("Uploading metadata");
       var path = Paths.get(args.getOptionValues("readMetadata").get(0));
-      
+
       metadataHandler.updateMetadata(path, args.containsOption("predict"));
     }
   }
