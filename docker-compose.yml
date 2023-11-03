@@ -166,15 +166,12 @@ services:
       timeout: 10s
       retries: 120
   frontend:
-    depends_on:
-      - es01
-      - es02
-      - db
     build: 
       dockerfile: ../docker/frontend/Dockerfile
       context: ./frontend
     ports: 
      - 3000:3000
+    hostname: frontend
     volumes:
       - type: bind
         source: ./data
@@ -185,6 +182,7 @@ services:
     build: 
       dockerfile: ../docker/server/Dockerfile
       context: ./server
+    restart: always
     ports: 
      - "9000:9000"
   pytorch:
