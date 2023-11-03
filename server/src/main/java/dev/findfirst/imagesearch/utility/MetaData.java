@@ -29,7 +29,7 @@ public record MetaData(
     return this.imagePath.toFile().exists();
   }
 
-  public MetaData(Map m, Path jsonPath) {
+  public MetaData(Map<String, String> m, Path jsonPath) {
     this("", getFigure(m), m.get("name"), getCaption(m), jsonPath, null);
   }
 
@@ -37,19 +37,21 @@ public record MetaData(
     this(documentId, (String) t, (String) f, (String) c, jsonPath, null, null);
   }
 
-  public static String findAttr(Map m, String... opts) {
+  public static String findAttr(Map<String, String> m, String... opts) {
     for (var i = 0; i < opts.length; i++) {
       var v = m.get(opts[i]);
-      if (v != null) return (String) v;
+      if (v != null){ 
+        return v;
+      }
     }
     return "";
   }
 
-  private static String getCaption(Map m) {
+  private static String getCaption(Map<String, String> m) {
     return findAttr(m, "caption_text", "caption", "text");
   }
 
-  private static String getFigure(Map m) {
+  private static String getFigure(Map<String, String> m) {
     return findAttr(m, "figType", "figure_type");
   }
 

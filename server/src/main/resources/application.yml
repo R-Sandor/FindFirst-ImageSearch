@@ -8,10 +8,8 @@
 #     properties.mail.smtp:
 #       auth: true
 #       starttls.enable: true
-
 server:
   port: 9000
-
 jwt:
   # In production set these values from the commandline
   # or do something like https://medium.com/developervisits/hiding-encrypting-database-password-in-the-application-properties-34d59fe104eb

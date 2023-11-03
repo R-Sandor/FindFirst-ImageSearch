@@ -38,7 +38,6 @@ public class ElasticClient
   public RestClient restClient() {
     try {
       log.info("username: {}, password: {}", username, password);
-      // TODO: Should be on the dev profile to run this on self-signed TLS server.
       final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
       credentialsProvider.setCredentials(
           AuthScope.ANY, new UsernamePasswordCredentials(username, password));

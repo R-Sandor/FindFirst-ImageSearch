@@ -62,6 +62,5 @@ public class BookmarkitApplication implements ApplicationRunner {
       
       metadataHandler.updateMetadata(path, args.containsOption("predict"));
     }
-    // TODO Auto-generated method stub
   }
 }

@@ -16,12 +16,14 @@ import java.util.Set;
 import dev.findfirst.security.model.Tenantable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Entity
 @Table(name = "bookmark")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Bookmark extends Tenantable {

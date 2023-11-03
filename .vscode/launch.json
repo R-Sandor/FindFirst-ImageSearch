@@ -22,10 +22,16 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.findfirst.BookmarkitApplication",
             "projectName": "bookmarkit",
-            // Production
-            // "args": "--readMetadata=${workspaceFolder}/data/SciFig/metadata/",
-            // pilot data
-            // "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/ --predict",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-BookmarkitApplication<server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "dev.findfirst.BookmarkitApplication",
+            "projectName": "server",
+            "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
