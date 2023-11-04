@@ -171,13 +171,6 @@ services:
       context: ./frontend
     ports: 
      - 3000:3000
-    hostname: frontend
-    volumes:
-      - type: bind
-        source: ./data
-        target: /app/public/png
-    # environment:
-    #   - IMAGE_DIR=images
   backend:
     build: 
       dockerfile: ../docker/server/Dockerfile

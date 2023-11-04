@@ -1,4 +1,4 @@
-FROM node:20.5-alpine AS base
+FROM node:20.9-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -43,7 +43,7 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
+# COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
 RUN mkdir .next
@@ -53,6 +53,7 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 
@@ -60,6 +61,6 @@ EXPOSE 3000
 
 ENV PORT 3000
 # set hostname to localhost
-ENV HOSTNAME "frontend"
+ENV HOSTNAME "0.0.0.0"
 
 CMD ["node", "server.js"]
