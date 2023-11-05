@@ -36,6 +36,8 @@ CA_CERT='../../../conf/ca.crt'
 parser = argparse.ArgumentParser()
 parser.add_argument('--es_host', dest='es_host', required=False, default=ES_HOST,
                     help="Elasticsearch hostname. Must include HOST and PORT. Default: " + ES_HOST)
+parser.add_argument('--data-path', dest='data_path', required=False, default=PATH_TO_IMAGES,
+                    help="Dataset file location. Default: " + PATH_TO_IMAGES)
 parser.add_argument('--es_user', dest='es_user', required=False, default=ES_USER,
                     help="Elasticsearch username. Default: " + ES_USER)
 parser.add_argument('--es_password', dest='es_password', required=False, default=ES_PASSWORD,
@@ -70,7 +72,7 @@ def main():
     duration = time.perf_counter() - start_time
     print(f'Duration load model = {duration}')
 
-    filenames = glob.glob(PATH_TO_IMAGES, recursive=True)
+    filenames = glob.glob(args.data_path, recursive=True)
     start_time = time.perf_counter()
     for filename in tqdm(filenames, desc='Processing files', total=len(filenames)):
         image = Image.open(filename)
