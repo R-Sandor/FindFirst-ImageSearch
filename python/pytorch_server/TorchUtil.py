@@ -33,7 +33,7 @@ labels = [
     "venn diagram",
     "word cloud"
 ]
-tkns = ["a photo of a "+ label for label in labels]
+tkns = ["image of a "+ label for label in labels]
 text_inputs = clip.tokenize(tkns).to(device)
 
 def encode_image_query(query):

@@ -4,8 +4,12 @@ from flask_cors import cross_origin
 from PIL import Image
 import torch
 import clip
-import numpy 
+import numpy as np
 import json
+from tqdm import tqdm
+import os
+import time
+import glob
 
 app = Flask(__name__)
 
@@ -168,7 +172,7 @@ async def predict_embedding():
     with torch.no_grad():
         text_features = model.encode_text(text_inputs)
         # Pick the top 3 most similar labels for the image
-    image_features = numpy.asarray(image_features)    
+    image_features = np.asarray(image_features)    
     image_features = torch.Tensor(image_features).float().to(device)
     text_features /= text_features.norm(dim=-1, keepdim=True)
     similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
