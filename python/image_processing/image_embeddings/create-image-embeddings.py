@@ -6,13 +6,14 @@ import glob
 import time
 import json
 import argparse
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, util
 from elasticsearch import Elasticsearch, SSLError
 from elasticsearch.helpers import parallel_bulk
 from PIL import Image
 from tqdm import tqdm
 from datetime import datetime
 from exif import Image as exifImage
+import torch
 
 ES_HOST = "https://127.0.0.1:9200/"
 ES_USER = "elastic"
@@ -62,6 +63,58 @@ parser.add_argument('--extract_GPS_location', dest='gps_location', required=Fals
 
 args = parser.parse_args()
 
+labels = [
+    "algorithm",
+    "architecture diagram",
+    "bar chart",
+    "box plot",
+    "confusion matrix",
+    "graph",
+    "line graph chart",
+    "geographical map",
+    "natural image",
+    "neural network diagram",
+    "natural language processing grammar",
+    "pareto chart",
+    "pie chart",
+    "scatter plot",
+    "screenshot",
+    "table",
+    "tree diagram",
+    "venn diagram",
+    "word cloud"
+]
+tkns = ["image of a "+ label for label in labels]
+
+def make_prediction(img, model):
+
+    with torch.no_grad():
+        image_features = model.encode(img, convert_to_tensor=True)
+        text_features = model.encode(tkns, convert_to_tensor=True)
+
+    # Pick the top 3 most similar labels for the image
+    image_features /= image_features.norm(dim=-1, keepdim=True)
+    text_features /= text_features.norm(dim=-1, keepdim=True)
+    similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
+    values = similarity
+    for v in similarity.topk(3):
+        print(v)
+    print(len(similarity))
+
+    # #Compute cosine similarities 
+    # text_emb = model.encode(tkns, convert_to_tensor=True, normalize_embeddings=True)
+    # img_emb = model.encode(img, convert_to_tensor=True,  normalize_embeddings=True)
+    # print("text embedding")
+    # print(text_emb)
+    # print("image embedding")
+    # print(img_emb)
+    # # cos_scores = util.cos_sim(img_emb, text_emb).softmax(-1)
+    # similarity = (100.0 * img_emb @ text_emb.T).softmax(dim=-1)
+    # values, indices = similarity[0]
+    # print(values)
+
+
+
 
 def main():
     global args
@@ -82,6 +135,7 @@ def main():
         doc['_id'] = create_image_id(filename)
         doc['embedding'] = embedding.tolist()
         doc['path'] = os.path.relpath(filename).split(PREFIX)[1]
+        make_prediction(image, img_model) 
 
         lst.append(doc)
 
