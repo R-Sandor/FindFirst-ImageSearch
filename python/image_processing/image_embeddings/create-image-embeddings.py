@@ -63,7 +63,6 @@ parser.add_argument('--extract_GPS_location', dest='gps_location', required=Fals
 
 args = parser.parse_args()
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device)
 labels = [
     "algorithm",
     "architecture diagram",
