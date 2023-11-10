@@ -43,7 +43,8 @@ public class BookmarkitApplication implements ApplicationRunner {
             "http://localhost:8080",
             "http://127.0.0.1:3000",
             "http://127.0.0.1:8080",
-            "https://devfindfirst.dev:3000",
+            "https://findfirst.dev",
+            "http://findfirst.dev",
             "http://frontend",
             "http://frontend:3000",
             "https://frontend:3000"));
