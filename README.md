@@ -33,7 +33,7 @@ Check if the cluster is running using Kibana or `curl` or simple check the conta
 
 Once the cluster is up and running, get the CA certificate out from the Elasticsearch cluster to use it in the rest of the setup.
 ```bash
-$ docker cp academicimagesearch-es01-1://usr/share/elasticsearch/config/certs/ca/ca.crt ./conf
+$ docker cp findfirst-es01-1://usr/share/elasticsearch/config/certs/ca/ca.crt ./conf
 ```
 
 ### 2. Generate image embeddings
