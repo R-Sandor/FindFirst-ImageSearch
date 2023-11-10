@@ -22,7 +22,7 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.findfirst.BookmarkitApplication",
             "projectName": "bookmarkit",
-            "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/ --predict",
+            "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/",
             "envFile": "${workspaceFolder}/.env"
         },
         {
@@ -31,7 +31,7 @@
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "dev.findfirst.BookmarkitApplication",
-            "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/ --predict",
+            "args": "--readMetadata=${workspaceFolder}/data/SciFig-pilot/metadata/",
             "projectName": "server",
             "envFile": "${workspaceFolder}/.env"
         }
