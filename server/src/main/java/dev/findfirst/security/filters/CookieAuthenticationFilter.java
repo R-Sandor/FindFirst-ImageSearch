@@ -1,5 +1,8 @@
 package dev.findfirst.security.filters;
 
+import dev.findfirst.security.jwt.JwtService;
+import dev.findfirst.security.jwt.TenantAuthenticationToken;
+import dev.findfirst.security.utils.Constants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -13,20 +16,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import dev.findfirst.security.jwt.JwtService;
-import dev.findfirst.security.jwt.TenantAuthenticationToken;
-import dev.findfirst.security.utils.Constants;
-
+@Slf4j
 public class CookieAuthenticationFilter extends OncePerRequestFilter {
-
-  private static final Logger logger = LoggerFactory.getLogger(CookieAuthenticationFilter.class);
 
   @Autowired private JwtService jwtUtils;
 
@@ -73,9 +70,11 @@ public class CookieAuthenticationFilter extends OncePerRequestFilter {
       if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
         TenantAuthenticationToken tenantAuthenticationToken = getTenantAuthenticationToken(jwt);
         SecurityContextHolder.getContext().setAuthentication(tenantAuthenticationToken);
+      } else {
+        log.debug("no jwt");
       }
     } catch (Exception e) {
-      logger.error("Cannot set user authentication: {}", e);
+      log.error("Cannot set user authentication: {}", e);
     }
 
     filterChain.doFilter(request, response);
