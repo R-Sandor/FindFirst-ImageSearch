@@ -4,6 +4,8 @@ image simularity search.
 
 The goal is that a user should be able to query for academic figures are recieve relevant documents to the query. 
 
+### Live Demo: https://findfirst.dev
+
 ## Acknowledgements: 
 This project is borrowing heavily on others works, I would like to acknowledge these projects where applicable but
 broadly state my sources here: 
