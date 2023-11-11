@@ -31,12 +31,10 @@ function SearchBar({ classifications }: { classifications: string[] }) {
   }
 
   function searchByClasses() {
-    console.log("searching by class: ", classifications);
     api.ImageSearchClassification(classifications).then((response) => {
       searchResults.setSearchData(response.data);
     })
   }
-
 
   function onKeyDown(e: any) {
     const { keyCode } = e;
