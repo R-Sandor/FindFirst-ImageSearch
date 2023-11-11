@@ -32,7 +32,7 @@ function SearchBar({ classifications }: { classifications: string[] }) {
 
   function searchByClasses() {
     console.log("searching by class: ", classifications);
-    api.ImageSearchClassification(classifications[0]).then((response) => {
+    api.ImageSearchClassification(classifications).then((response) => {
       searchResults.setSearchData(response.data);
     })
   }

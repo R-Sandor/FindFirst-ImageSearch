@@ -65,7 +65,7 @@ const api = {
   },
   addAllTag(strTags: string[]) {
     let t = JSON.stringify(strTags);
-    return this.execute("POST", "tags/addTags", strTags, {});
+    return this.execute("POST", "tags/addTags", t, {});
   },
   getTagById(id: string) {
     return this.execute("GET", "tags/id/" + id, null, {});
@@ -97,13 +97,11 @@ const api = {
       image: file, // FileList will be unwrapped as sepate fields
     });
   },
-  ImageSearchClassification(classLbls: string) {
-    console.log("api call", classLbls)
-    return instance.get("imagesearch/class", {
-      params: {
-        classification: classLbls.toLowerCase().trim(),
-      },
-    });
+  ImageSearchClassification(classLbls: string[]) {
+    const cls = classLbls.map((cls) => {
+          return cls.toLowerCase().trim();
+        })
+    return instance.post("imagesearch/class", cls, {});
   },
 };
 
