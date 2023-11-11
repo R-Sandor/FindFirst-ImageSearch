@@ -1,8 +1,7 @@
 package dev.findfirst.imagesearch.service;
 
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.ACADEMIC_IMAGES;
-import static dev.findfirst.imagesearch.service.queries.ImageQueries.PREDS;
-import static dev.findfirst.imagesearch.service.queries.ImageQueries.byPredictionType;
+import static dev.findfirst.imagesearch.service.queries.ImageQueries.classificationQuery;
 import static dev.findfirst.imagesearch.service.queries.ImageQueries.sortByConfidence;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -51,20 +50,17 @@ public class ImageSearchService {
    * @throws ElasticsearchException error if elastic search is down.
    * @throws IOException error if deserialization fails etc.
    */
-  public List<AcademicImage> findTopResultsforImageClass(String imageClass, int k)
+  public List<AcademicImage> findTopResultsforImageClass(int k, String... imageClass)
       throws ElasticsearchException, IOException {
 
     // spotless:off 
     SearchResponse<AcademicImage> response = esClient.search(s -> s 
     .index(ACADEMIC_IMAGES)
     .query(q -> q
-      .nested( nestedQuery -> nestedQuery
-        .path(PREDS)
-        .query(pq -> pq 
-          .bool(b -> b
-            .must(byPredictionType(imageClass)))))
+      .bool(b -> b
+       .must(classificationQuery(imageClass)))
     )
-    .sort(sortByConfidence(imageClass)),AcademicImage.class);
+    .sort(sortByConfidence(imageClass[0])),AcademicImage.class);
     // spotless:on
 
     var aiHits = response.hits().hits();

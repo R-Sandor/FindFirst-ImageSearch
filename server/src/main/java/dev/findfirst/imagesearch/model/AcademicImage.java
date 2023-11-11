@@ -21,7 +21,9 @@ public class AcademicImage {
   public void setMetadata(MetaData metaData) {
     this.id = metaData.documentID();
     this.caption = metaData.caption();
-    this.predictions = metaData.predictions().predictions();
+    if (metaData.predictions() != null) {
+      this.predictions = metaData.predictions().predictions();
+    }
   }
 
   private String caption;

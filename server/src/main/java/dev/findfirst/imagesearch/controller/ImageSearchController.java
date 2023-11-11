@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,14 +48,14 @@ public class ImageSearchController {
     }
   }
 
-  @GetMapping("/class")
-  public ResponseEntity<List<AcademicImage>> classSearch(@RequestParam("classification") String imageClass) {
+  @PostMapping("/class")
+  public ResponseEntity<List<AcademicImage>> classSearch(@RequestBody String[] classifications) {
     try {
       return new Response<List<AcademicImage>>(
-              imageService.findTopResultsforImageClass(imageClass, 10), HttpStatus.OK)
+              imageService.findTopResultsforImageClass(10, classifications), HttpStatus.OK)
           .get();
     } catch (ElasticsearchException | IOException e) {
-      log.error("error while querying for {}, error: {}", imageClass, e);
+      log.error("error while querying for {}, error: {}", classifications, e);
       return new Response<List<AcademicImage>>(null, HttpStatus.BAD_REQUEST).get();
     }
   }
