@@ -7,7 +7,11 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.NestedQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.json.JsonData;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ImageQueries {
@@ -17,6 +21,12 @@ public class ImageQueries {
   public static final String PREDS_LBL = "predictions.label";
   public static final String PREDS_CONF = "predictions.confidence";
 
+  /**
+   * Basic query to sort by one single imageClass.
+   *
+   * @param imageClass class to search.
+   * @return Query for single classifications.
+   */
   public static Query byPredictionType(String imageClass) {
     return MatchQuery.of(m -> m.field(PREDS_LBL).query(imageClass))._toQuery();
   }
@@ -26,7 +36,7 @@ public class ImageQueries {
    * classifications. For example if "Graph and Box plot" are selected then only the documents that
    * have both these predictions in their top k will be returned.
    *
-   * @param imageClasses
+   * @param imageClasses classes of images to search.
    * @return List<Query> that is a list of NestedQuery.
    */
   public static List<Query> classificationQuery(String... imageClasses) {
@@ -41,6 +51,31 @@ public class ImageQueries {
     return queries;
   }
 
+  public static Query knnQuery(double[] embedding, String... imageClass)
+      throws JsonProcessingException {
+
+    var query =
+        (imageClass != null && imageClass.length > 0)
+            ? Query.of(q -> q.bool(b -> b.must(classificationQuery(imageClass))))
+            : QueryBuilders.matchAll().build()._toQuery();
+
+    // spotless:off
+    return Query.of(
+      q -> q
+        .scriptScore(ss -> ss.query(query)
+          .script(s -> s
+            .inline(i -> i
+              .source("cosineSimilarity(params.queryVector, 'embedding')+1.0")
+              .params("queryVector", JsonData.fromJson(Arrays.toString(embedding)))))));
+    // spotless:on
+  }
+
+  /**
+   * Sort by confidence of image classifications selected.
+   *
+   * @param imageClass array of image classes.
+   * @return SortOptions that sorts by the predictions.confidence
+   */
   public static SortOptions sortByConfidence(String... imageClass) {
 
     var fieldValues = new ArrayList<FieldValue>();

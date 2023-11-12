@@ -38,10 +38,11 @@ public class ImageSearchController {
 
   @PostMapping("/image")
   public ResponseEntity<List<AcademicImage>> handleFileUpload(
-      @RequestParam("image") MultipartFile file) {
+      @RequestParam("image") MultipartFile file,
+      @RequestParam(name = "classifications", required = false) String[] imageClasses) {
     try {
       return new Response<List<AcademicImage>>(
-              imageService.findSimilarImages(file, 10), HttpStatus.OK)
+              imageService.findSimilarImages(file, 10, imageClasses), HttpStatus.OK)
           .get();
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
