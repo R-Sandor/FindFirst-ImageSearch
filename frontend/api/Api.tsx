@@ -87,9 +87,12 @@ const api = {
   removeBookmarkById(id: string) {
     return this.execute("DELETE", "bookmarks/" + id, null, {});
   },
-  ImageSearchText(searchText: string) {
+  ImageSearchText(searchText: string, classes: string[]) {
     return instance.post("imagesearch/text", null, {
-      params: { text: searchText },
+      params: { 
+        text: searchText,
+        classifications: classes.join(",")
+      }
     });
   },
   ImageSearchImage(file: File) {

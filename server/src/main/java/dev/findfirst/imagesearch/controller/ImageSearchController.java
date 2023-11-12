@@ -31,8 +31,11 @@ public class ImageSearchController {
   }
 
   @PostMapping("/text")
-  public ResponseEntity<List<AcademicImage>> textSearch(@RequestParam("text") String text) {
-    return new Response<List<AcademicImage>>(imageService.findByQuery(text, 10), HttpStatus.OK)
+  public ResponseEntity<List<AcademicImage>> textSearch(
+      @RequestParam("text") String text,
+      @RequestParam(name = "classifications", required = false) String[] imageClasses) {
+    return new Response<List<AcademicImage>>(
+            imageService.findByQuery(text, 10, imageClasses), HttpStatus.OK)
         .get();
   }
 

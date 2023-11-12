@@ -24,7 +24,7 @@ function SearchBar({ classifications }: { classifications: string[] }) {
       searchByClasses()
     }
     else if (searchText.trim() != "") {
-      api.ImageSearchText(searchText).then((response) => {
+      api.ImageSearchText(searchText, classifications).then((response) => {
         searchResults.setSearchData(response.data);
       });
     }

@@ -41,19 +41,21 @@ public class ImageSearchService {
    * @param k the number of hits to return.
    * @return List of top hits.
    */
-  public List<AcademicImage> findByQuery(String text, int k) {
-    return queryByImageVect(torch.getEmbeddings(text)).stream().map(h -> h.source()).toList();
+  public List<AcademicImage> findByQuery(String text, int k, String... imageClasses) {
+    return queryByImageVect(torch.getEmbeddings(text), imageClasses).stream()
+        .map(h -> h.source())
+        .toList();
   }
 
   /**
    * Finds the top results for a classification.
    *
-   * @param imageClass (i.e. graph, scatter plot, box chart, etc)
+   * @param imgClasses (i.e. graph, scatter plot, box chart, etc)
    * @return List of Academic-Figures
    * @throws ElasticsearchException error if elastic search is down.
    * @throws IOException error if deserialization fails etc.
    */
-  public List<AcademicImage> findTopResultsforImageClass(int k, String... imageClass)
+  public List<AcademicImage> findTopResultsforImageClass(int k, String... imgClasses)
       throws ElasticsearchException, IOException {
 
     // spotless:off 
@@ -61,9 +63,9 @@ public class ImageSearchService {
     .index(ACADEMIC_IMAGES)
     .query(q -> q
       .bool(b -> b
-       .must(classificationQuery(imageClass)))
+       .must(classificationQuery(imgClasses)))
     )
-    .sort(sortByConfidence(imageClass[0])),AcademicImage.class);
+    .sort(sortByConfidence(imgClasses[0])),AcademicImage.class);
     // spotless:on
 
     return response.hits().hits().stream().limit(k).map(aih -> aih.source()).toList();
@@ -100,8 +102,8 @@ public class ImageSearchService {
    */
   private List<Hit<AcademicImage>> queryByImageVect(double[] embedding, String... imageClasses) {
     try {
-      Query q = knnQuery(embedding, imageClasses);
-      return esClient.search(s -> s.query(q), AcademicImage.class).hits().hits();
+      Query knn = knnQuery(embedding, imageClasses);
+      return esClient.search(s -> s.query(knn), AcademicImage.class).hits().hits();
     } catch (ElasticsearchException | IOException e) {
       log.error("Error searching for image by embedding {}", e);
     }
