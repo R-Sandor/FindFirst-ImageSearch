@@ -57,7 +57,7 @@ function SearchBar({ classifications }: { classifications: string[] }) {
           value={searchText}
         />
         <div className="input-group-append">
-          <Filepicker setSearch={setSearch} />
+          <Filepicker setSearch={setSearch} classifications={classifications} />
           <button
             type="button"
             onClick={() => searchNow()}

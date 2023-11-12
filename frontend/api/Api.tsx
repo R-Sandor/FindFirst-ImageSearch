@@ -95,9 +95,10 @@ const api = {
       }
     });
   },
-  ImageSearchImage(file: File) {
+  ImageSearchImage(file: File, classes: string[]) {
     return instance.postForm("imagesearch/image", {
       image: file, // FileList will be unwrapped as sepate fields
+      classifications: classes.join(","),
     });
   },
   ImageSearchClassification(classLbls: string[]) {

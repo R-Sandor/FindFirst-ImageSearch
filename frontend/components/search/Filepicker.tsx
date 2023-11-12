@@ -11,7 +11,8 @@ import {
 } from "use-file-picker/validators";
 
 export default function FilePicker(pickerProp: {
-  setSearch: Dispatch<SetStateAction<string>>;
+  setSearch: Dispatch<SetStateAction<string>>,
+  classifications: string[];
 }) {
   const searchResults = useContext(SearchResultsContext);
   const { openFilePicker, filesContent, loading, errors } = useFilePicker({
@@ -31,7 +32,7 @@ export default function FilePicker(pickerProp: {
     onFilesSuccessfullySelected: ({ plainFiles, filesContent }) => {
       // this callback is called when there were no validation errors
       pickerProp.setSearch(plainFiles[0].name);
-      api.ImageSearchImage(plainFiles[0]).then((response) => {
+      api.ImageSearchImage(plainFiles[0], pickerProp.classifications).then((response) => {
         searchResults.setSearchData(response.data);
       });
     },
