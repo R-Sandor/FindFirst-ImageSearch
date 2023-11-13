@@ -30,6 +30,6 @@ COPY --from=build /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 COPY . /app
 EXPOSE 5000
-ENV FLASK_ENV="development"
+ENV FLASK_ENV="production"
 ENV FLASK_APP=server.py
 ENTRYPOINT [ "./runflask.sh" ]
