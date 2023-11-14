@@ -1,16 +1,16 @@
-.PHONY= build_server build_client
-.DEFAULT_GOAL := default 
+.PHONY: server frontend
+.DEFAULT_GOAL:= default 
 
 default: 
 	cd server; ./gradlew clean build
 	$(MAKE) build_server
 	$(MAKE) build_client
 
-build_server: 
-	docker build -t findfirst/server -f ./docker/server/Dockerfile ./
+server: 
+	docker build -t findfirst-backend -f ./docker/server/Dockerfile ./server
 
-build_client: 
-	docker build -t findfirst/client -f ./docker/client/Dockerfile ./client
+frontend: 
+	docker build -t findfirst-frontend -f ./docker/frontend/Dockerfile ./frontend
 
 clean: 
 	cd server; ./gradlew clean; 
