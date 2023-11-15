@@ -6,8 +6,8 @@ import {
   Form,
   Button,
   ButtonGroup,
-  Container,
 } from "react-bootstrap";
+import styles from "./Button.module.css";
 import { useRouter } from "next/navigation";
 import authService, { AuthStatus } from "@services/auth.service";
 import useAuth from "@components/UseAuth";
@@ -22,13 +22,13 @@ const GlobalNavbar: React.FC = () => {
       return (
         <ButtonGroup>
           <Button
-            variant="secondary"
+            className={styles.btn}
             onClick={() => router.push("/account/login")}
           >
             Login
           </Button>
           <Button
-            variant="secondary"
+            className={styles.btn}
             onClick={() => router.push("/account/signup")}
           >
             Signup

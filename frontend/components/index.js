@@ -1,3 +1,3 @@
-export * from './Navbar';
+export * from './nav/Navbar';
 export * from './Alert';
 export * from './search';

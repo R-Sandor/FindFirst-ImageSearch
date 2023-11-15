@@ -1,7 +1,7 @@
 // adapted from https://github.com/Jaaneek/useFilePicker
 import api from "@/api/Api";
+import { FileSelectContext } from "@/contexts/FileSelectContext";
 import { SearchResultsContext } from "@/contexts/SearchContext";
-import { FigureData } from "@/types/Bookmarks/FigureData";
 import { Dispatch, SetStateAction, useContext } from "react";
 import { useFilePicker } from "use-file-picker";
 import {
@@ -15,6 +15,7 @@ export default function FilePicker(pickerProp: {
   classifications: string[];
 }) {
   const searchResults = useContext(SearchResultsContext);
+  const fileSelect = useContext(FileSelectContext);
   const { openFilePicker, filesContent, loading, errors } = useFilePicker({
     readAs: "DataURL",
     accept: "image/*",
@@ -31,8 +32,10 @@ export default function FilePicker(pickerProp: {
     ],
     onFilesSuccessfullySelected: ({ plainFiles, filesContent }) => {
       // this callback is called when there were no validation errors
-      pickerProp.setSearch(plainFiles[0].name);
-      api.ImageSearchImage(plainFiles[0], pickerProp.classifications).then((response) => {
+      const userFile = plainFiles[0];
+      pickerProp.setSearch(userFile.name);
+      fileSelect.setFileData(userFile)
+      api.ImageSearchImage(userFile, pickerProp.classifications).then((response) => {
         searchResults.setSearchData(response.data);
       });
     },

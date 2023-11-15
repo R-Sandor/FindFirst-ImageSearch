@@ -102,6 +102,7 @@ const api = {
     });
   },
   ImageSearchClassification(classLbls: string[]) {
+    console.log(classLbls)
     const cls = classLbls.map((cls) => {
           return cls.toLowerCase().trim();
         })

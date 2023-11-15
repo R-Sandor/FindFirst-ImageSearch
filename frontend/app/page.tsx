@@ -8,6 +8,7 @@ import {
   SearchResultProvider,
   SearchResultsContext,
 } from "@/contexts/SearchContext";
+import { FileSelectProvider } from "@/contexts/FileSelectContext";
 const IMAGE_DIR = process.env.IMAGE_DIR;
 const catagories = [
   "Algorithms",
@@ -32,30 +33,29 @@ const catagories = [
 ];
 
 const labels = [
-    "algorithm",
-    "architecture diagram",
-    "bar chart",
-    "box plot",
-    "confusion matrix",
-    "graph",
-    "line graph chart",
-    "geographical map",
-    "natural image",
-    "neural network diagram",
-    "natural language processing grammar",
-    "pareto chart",
-    "pie chart",
-    "scatter plot",
-    "screenshot",
-    "table",
-    "tree diagram",
-    "venn diagram",
-    "word cloud"
-]
+  "algorithm",
+  "architecture diagram",
+  "bar chart",
+  "box plot",
+  "confusion matrix",
+  "graph",
+  "line graph chart",
+  "geographical map",
+  "natural image",
+  "neural network diagram",
+  "natural language processing grammar",
+  "pareto chart",
+  "pie chart",
+  "scatter plot",
+  "screenshot",
+  "table",
+  "tree diagram",
+  "venn diagram",
+  "word cloud",
+];
 
 function imagePath(path: string): string {
   // use the specified directory or default
-  console.log(path);
   // path = path + ".png"
   return IMAGE_DIR != (undefined || null)
     ? IMAGE_DIR + "/" + path
@@ -116,23 +116,14 @@ export default function App() {
     new Array(catagories.length).fill(false)
   );
   const [checkedLbl, setCheckedLbl] = useState<string[]>([]);
-  function classSearch() {
-    return checkedState.flatMap((v, i) => {
-      console.log(v);
-      if (v == true) {
-        console.log(i);
-        return i;
-      }
-      return [];
-    });
-  }
 
   useEffect(() => {
-    console.log(checkedState);
+    /**
+     * We have two correlated arrays. One that states if the box is checked
+     * and this function to then take those indexes to get the labels.
+     */
     let lbls = checkedState.flatMap((v, i) => {
-      console.log(v);
       if (v == true) {
-        console.log(i);
         return labels[i];
       }
       return [];
@@ -141,16 +132,14 @@ export default function App() {
   }, [checkedState]);
 
   const handleOnChange = (position: number) => {
-    console.log(position);
     setCheckedState(
       checkedState.map((item, index) => (index === position ? !item : item))
     );
-
-    console.log(checkedLbl);
   };
 
   return (
     <SearchResultProvider>
+      <FileSelectProvider>
       <div className="row">
         <div className="row">
           <SearchBar classifications={checkedLbl} />
@@ -181,13 +170,13 @@ export default function App() {
         </div>
         <MainSearchResults />
       </div>
+      </FileSelectProvider>
     </SearchResultProvider>
   );
 }
 
 function MainSearchResults() {
   const searchResults = useContext(SearchResultsContext);
-  // console.log(searchResults.searchData)
   return (
     <div className="col-9">
       <div className="row">

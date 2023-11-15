@@ -1,6 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import Navbar from '@components/Navbar'
+import Navbar from '@components/navbar/Navbar'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.min.css'
 import {NavigationEvents} from '@components/navigation-events'
