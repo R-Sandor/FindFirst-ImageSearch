@@ -14,6 +14,14 @@ broadly state my sources here:
   - Used for the basis of the indexing and document emmbedding. 
   - Including the setup in this very ReadMe.md.
 
+# Application Setup/Run
+## Requirements & Assumptions: 
+- Unix Operating System
+- Modern CPU (>= ~3.5GHz; Multicore)
+- 16GB of RAM
+- 32GB of storage (for images)
+- Docker & Docker Compose installed on Host.
+<details><summary>Application Setup/Local Execution</summary>
 
 ### 0 Step. 
 We must set up a Python environment to use scripts for image embeddings. 
@@ -120,4 +128,4 @@ $ frontend/public/png
 ```bash
 $ docker compose up db frontend backend
 ```
-
+</details>
