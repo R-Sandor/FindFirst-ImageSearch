@@ -21,7 +21,7 @@ broadly state my sources here:
 - 16GB of RAM
 - 32GB of storage (for images)
 - Docker & Docker Compose installed on Host.
-<details><summary>Application Setup/Local Execution</summary>
+<details open><summary>Application Setup/Local Execution</summary>
 
 ### 0 Step. 
 We must set up a Python environment to use scripts for image embeddings. 
