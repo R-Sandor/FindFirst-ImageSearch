@@ -79,6 +79,7 @@ data/
     ├── venn diagram
     └── word cloud
 ```
+
 ```bash
 $ cd python/image_embeddings/image_processing
 $ python3 create-image-embeddings.py --es_host='https://127.0.0.1:9200' \
@@ -129,3 +130,24 @@ $ frontend/public/png
 $ docker compose up db frontend backend
 ```
 </details>
+
+
+# CLIP
+As mentioned in https://github.com/openai/CLIP the original zero-shot clip model has been trained on 1.28M labelled examples which allows for the user of the model to be able to do semantic search. This allows the user of the model to provide an a sentence in the from of string characters to the model and recieve and vector representing the string. The same is true for providing an image, such png or jpeg, to the model. 
+
+This allows the user to use the vector data to compare texts to and image, and use the image in search engines such as elastic search which can use  k-nearest-neighbors (KNN) search. 
+
+<details><summary>More about CLIP and research</summary>
+
+## CLIP SentenceTransformers
+There is one problem with this, while model itself provides adequate results for general text to image, and image to image translation e.g. "cats on a bed", it doesn't perform well for tasks of classification on labels. Using the zero shot model in the application of classifying images on 19 different labels from ACL Academic Figure set revealed that there is glaring bias to certian classifications. For example, when the figure has more text, such as captions included, the model assumes that the figure contains data about Natural Language Processing (N.L.P.).
+
+# References 
+<details>
+<summary>References</summary>
+- 
+
+</details>
+
+</details>
+
