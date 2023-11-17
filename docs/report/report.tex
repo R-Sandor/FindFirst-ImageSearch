@@ -1,0 +1,68 @@
+\documentclass[article, 10pt]{article} 
+\usepackage{graphicx} % Required for inserting images
+
+\title{CS734-ImageSimilarityReport}
+\author{rsand006 }
+\date{November 2023}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+% TODO ON SATURDAY 11-17-2023
+
+\section{Data}
+% TODO ON SUNDAY 11-18-2023
+\subsection{About the data}
+Descriptions about what we know about the data.
+
+\subsection{The metadata}
+% TODO ON MONDAY
+Example of the metadata.
+
+\section{Project Architecture}
+% TUESDAY
+\subsection{Proposed solution}
+% WEDNESDAY
+
+\subsection{Changes in design}
+% THURSDAY (THANKSGIVING) 11-23-2023
+Create microservice for pytorch.
+
+\section{CLIP}
+As mentioned in https://github.com/openai/CLIP the original zero-shot clip model has been trained on 1.28M labelled examples which allows for the user of the model to be able to do semantic search. This allows the user of the model to provide an a sentence in the from of string characters to the model and receive and vector representing the string. The same is true for providing an image, such png or jpeg, to the model. 
+
+This allows the user to use the vector data to compare texts to and image, and use the image in search engines such as elastic search which can use  k-nearest-neighbors (KNN) search. 
+
+\subsection{Sentence Transformers}
+
+
+There is one problem with this, while model itself provides adequate results for general text to image, and image to image translation e.g. "cats on a bed", it doesn't perform well for tasks of classification on labels. Using the zero shot model in the application of classifying images on 19 different labels from ACL Academic Figure set revealed that there is glaring bias to certian classifications. For example, when the figure has more text, such as captions included, the model assumes that the figure contains data about Natural Language Processing (N.L.P.).
+
+\subsubsection{Training Sentence Transformers}
+\subsection{Pytorch} Discuss using sentence transformers. 
+\subsection{Tokenization} The tokenization is input sensitive
+\subsection{Pytorch CLIP model vs using Sentence Transformers }
+
+\section{Search}
+\subsection{Searching} discus applying filters: https://www.elastic.co/guide/en/elasticsearch/reference/current/filter-search-results.html
+  - performance on a post filter vs filter.
+\subsubsection{Nested sorting}
+\subsection{Scoring}
+\subsection{Evaluation}
+
+
+\section{Model improvements}
+\subsection{Methods}
+\subsection{Evaluation}
+
+
+\section{Search improvements}
+
+\section{Lessons learned} 
+Using a the image CLIP model to do image classification has limitations. 
+
+
+
+\end{document}
