@@ -1,8 +1,15 @@
 \documentclass[article, 10pt]{article} 
 \usepackage{graphicx} % Required for inserting images
+% \usepackage{biblatex}
+% \usepackage{hyperref}
+% \usepackage[pdftex,bookmarksnumbered,hidelinks,breaklinks]{hyperref}
+\usepackage[hyphens]{url}  %% be sure to specify the option 'hyphens'
+\usepackage{pythonhighlight}
+\graphicspath{ {./images/} }
+\usepackage{listings}
+\title{FindFirst Image Similarity Search \\ \large Dr. Jian Wu  Information Retrieval}
 
-\title{CS734-ImageSimilarityReport}
-\author{rsand006 }
+\author{Raphael J. Sandor }
 \date{November 2023}
 
 \begin{document}
@@ -10,59 +17,171 @@
 \maketitle
 
 \section{Introduction}
-% TODO ON SATURDAY 11-17-2023
+The objective of FindFirst Image similarity search is create a search engine that is capable of text to image 
+and image to image search while using semantic understanding to render the closest image to the provided query. 
+The search engine must be able to classify a given image between the nineteen different types of figures.
+With a responsive interface to a users requests, i.e. images return to the user in less than a second. 
+Other features that were employed in the application was probabilistic approach to labeling the images to figure
+classifications as is discussed later in this report, as well investigation into improving the classification model. 
+
+% TODO ON SATURDAY 11-18-2023
 
 \section{Data}
-% TODO ON SUNDAY 11-18-2023
+% TODO ON SUNDAY 11-19-2023
+% DISCUSS ACL FIGURE DATA SET 
+% - WHERE IT COMES FROM 
+% - THE AMOUNT OF DATA
+% - PLEASE REFERENCE THE PAPER 
+% - CHALLENGES OF THE DATA
 \subsection{About the data}
 Descriptions about what we know about the data.
-
+\begin{enumerate}
+    \item Algorithms
+    \item Architecture Diagrams 
+    \item Bar Charts 
+    \item Box Plots 
+    \item Confusion Matrix
+    \item Graphs
+    \item Line Graph Chart
+    \item Geographical Map
+    \item Natural Image
+    \item Neural Network Diagram 
+    \item Natural Language Processing 
+    \item Pareto Chart 
+    \item Pie Chart 
+    \item Scatter Chart 
+    \item Screenshot 
+    \item Table 
+    \item Tree Diagram 
+    \item Venn Diagram 
+    \item Word Cloud 
+\end{enumerate}
 \subsection{The metadata}
-% TODO ON MONDAY
+% TODO ON MONDAY 11-20-2023
 Example of the metadata.
 
 \section{Project Architecture}
-% TUESDAY
+% TUESDAY 11-21
+
 \subsection{Proposed solution}
-% WEDNESDAY
+% WEDNESDAY 11-22
 
 \subsection{Changes in design}
 % THURSDAY (THANKSGIVING) 11-23-2023
-Create microservice for pytorch.
+Create microservice for Pytorch.
+
+\section{Deployment}
+% 11-24
+
+\subsection{System Requirements}
+% 11-25
+
+\subsection{Performance}
+% 11-26
 
 \section{CLIP}
-As mentioned in https://github.com/openai/CLIP the original zero-shot clip model has been trained on 1.28M labelled examples which allows for the user of the model to be able to do semantic search. This allows the user of the model to provide an a sentence in the from of string characters to the model and receive and vector representing the string. The same is true for providing an image, such png or jpeg, to the model. 
+As mentioned in https://github.com/openai/CLIP the original zero-shot clip model has been trained on 1.28M labelled examples which allows for the user of the model to be able to do semantic search \cite{OpenAI}. This allows the user of the model to provide an a sentence in the from of string characters to the model and receive and vector representing the string. The same is true for providing an image, such png or jpeg, to the model. 
 
 This allows the user to use the vector data to compare texts to and image, and use the image in search engines such as elastic search which can use  k-nearest-neighbors (KNN) search. 
 
 \subsection{Sentence Transformers}
+The model card that is available on GitHub from OpenAI/CLIP was initially used for the classification of the models
+\begin{python}
+import torch
+import clip
+from PIL import Image
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model, preprocess = clip.load("ViT-B/32", device=device)
 
-There is one problem with this, while model itself provides adequate results for general text to image, and image to image translation e.g. "cats on a bed", it doesn't perform well for tasks of classification on labels. Using the zero shot model in the application of classifying images on 19 different labels from ACL Academic Figure set revealed that there is glaring bias to certian classifications. For example, when the figure has more text, such as captions included, the model assumes that the figure contains data about Natural Language Processing (N.L.P.).
+image = preprocess(Image.open("CLIP.png")).unsqueeze(0).to(device)
+text = clip.tokenize(["a diagram", "a dog", "a cat"]).to(device)
+
+with torch.no_grad():
+    image_features = model.encode_image(image)
+    text_features = model.encode_text(text)
+    
+    logits_per_image, logits_per_text = model(image, text)
+    probs = logits_per_image.softmax(dim=-1).cpu().numpy()
+
+print("Label probs:", probs)  # prints: [[0.9927937  0.00421068 0.00299572]]
+\end{python} \cite{OpenAI}
+The model out of the box is as shown above is not optimized for hardware. For example running the model on image to predictions produced 4.25 classifications per second, on a dataset of 264k images this would take nearly seventeen and half hours to complete. 
+
+Pre-optimized solutions were researched to reduce the amount of time to produce classifications on the full dataset. This resulted in testing the use of SBERT CLIP model with their sentence-transformer \cite{SBERT}.
+The predictions on the Sentence-Transformer verses the native Pytorch model were within
+tolerance of approximately .020-.026 with Sentence-Transformers producing 17.5/its, thereby reducing the prediction time to 4.19 hours.
+
+\subsection{Fine Tuning CLIP}
+There is one problem with this, while model itself provides adequate results for general text to image, and image to image translation e.g. "cats on a bed", it doesn't perform well for tasks specialized classification on labels.
+Using the zero shot model in the application of classifying images on 19 different labels from ACL Academic Figure set revealed that there is glaring bias to certain classifications. For example, when the figure has more text, such as captions included, the model assumes that the figure contains data about Natural Language Processing (N.L.P.), 
+other issues include types of charts that occupy a low percentage of the overall dataset such Pareto Charts are occurring
+frequently in queries. 
+
+The solution is thus to fine tune the model to the dataset of ACLs figures type, the challenge being that there is a limited 
+a limited number of labelled data. In total there is only 1671 labeled images in the pilot (training) dataset. 
+
 
 \subsubsection{Training Sentence Transformers}
-\subsection{Pytorch} Discuss using sentence transformers. 
-\subsection{Tokenization} The tokenization is input sensitive
+
+% 11-17
+
 \subsection{Pytorch CLIP model vs using Sentence Transformers }
+% 11-18
+
+
+\subsection{Pytorch} 
+% 11-23
+Discuss using Sentence Transformers. 
+
+\subsection{Tokenization} 
+% 11-27
+The tokenization is input sensitive
+
 
 \section{Search}
-\subsection{Searching} discus applying filters: https://www.elastic.co/guide/en/elasticsearch/reference/current/filter-search-results.html
+% 11-28
+\subsection{Searching}
+% 11-29
+discus applying filters: https://www.elastic.co/guide/en/elasticsearch/reference/current/filter-search-results.html
   - performance on a post filter vs filter.
 \subsubsection{Nested sorting}
+% 11-30
 \subsection{Scoring}
+% 12-01
+
 \subsection{Evaluation}
+% 12-02
 
 
-\section{Model improvements}
-\subsection{Methods}
-\subsection{Evaluation}
-
+% This section may end up being covered a earlier
+% \section{Model improvements}
+% \subsection{Methods}
+% \subsection{Evaluation}
 
 \section{Search improvements}
+% 12-03
+\subsection{Multi modal}
+% 12-04
+Showing how the search improves with multi modal 
+\subsection{Re-render on users clicking check boxes}
+% 12-05
+\subsection{Images are cached to be reused in queries}
+% 12-06
+
+\subsection{Find Similar}
+% 12-07
 
 \section{Lessons learned} 
+% 12-08
 Using a the image CLIP model to do image classification has limitations. 
 
 
+\begin{thebibliography}{99}
+\bibitem{OpenAI} OpenAI (2023, July 8). CLIP. GitHub; OpenAI. https://github.com/openai/CLIP
+\bibitem{SBERT} SentenceTransformers Documentation — Sentence-Transformers documentation. (n.d.). Www.sbert.net. https://www.sbert.net/
+
+
+\end{thebibliography}
 
 \end{document}
