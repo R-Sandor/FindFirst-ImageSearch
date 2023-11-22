@@ -6,12 +6,8 @@ server/bin/*
 server/build/*
 server/.gradle/*
 bckups/pilot_image_backup
-image_processing/data/*
-image_processing/__pycache__
-.ipynb_checkpoints/*
 data/**
 bckups/*.tar
-**/__pycache__/*
 .VSCodeCounter
 
 .venv
