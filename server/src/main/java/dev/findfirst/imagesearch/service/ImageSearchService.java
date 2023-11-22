@@ -65,7 +65,7 @@ public class ImageSearchService {
       .bool(b -> b
        .must(classificationQuery(imgClasses)))
     )
-    .sort(sortByConfidence(imgClasses[0])),AcademicImage.class);
+    .sort(sortByConfidence(imgClasses)),AcademicImage.class);
     // spotless:on
 
     return response.hits().hits().stream().limit(k).map(aih -> aih.source()).toList();
