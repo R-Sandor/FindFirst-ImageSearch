@@ -2,8 +2,8 @@
 \usepackage{graphicx} % Required for inserting images
 % \usepackage{biblatex}
 % \usepackage{hyperref}
-% \usepackage[pdftex,bookmarksnumbered,hidelinks,breaklinks]{hyperref}
-\usepackage[hyphens]{url}  %% be sure to specify the option 'hyphens'
+\usepackage[pdftex,bookmarksnumbered,hidelinks,breaklinks]{hyperref}
+% \usepackage[hyphens]{url}  %% be sure to specify the option 'hyphens'
 \usepackage{pythonhighlight}
 \graphicspath{ {./images/} }
 \usepackage{listings}
@@ -112,31 +112,38 @@ Pre-optimized solutions were researched to reduce the amount of time to produce 
 The predictions on the Sentence-Transformer verses the native Pytorch model were within
 tolerance of approximately .020-.026 with Sentence-Transformers producing 17.5/its, thereby reducing the prediction time to 4.19 hours.
 
+\subsubsection{Tokenization}
+% Discuss Sensitivity to class string.
+
 \subsection{Fine Tuning CLIP}
 There is one problem with this, while model itself provides adequate results for general text to image, and image to image translation e.g. "cats on a bed", it doesn't perform well for tasks specialized classification on labels.
-Using the zero shot model in the application of classifying images on 19 different labels from ACL Academic Figure set revealed that there is glaring bias to certain classifications. For example, when the figure has more text, such as captions included, the model assumes that the figure contains data about Natural Language Processing (N.L.P.), 
-other issues include types of charts that occupy a low percentage of the overall dataset such Pareto Charts are occurring
-frequently in queries. 
+Using the zero shot model in the application of classifying images on 19 different labels from ACL Academic Figure set revealed that there is glaring bias to certain classifications. For example, when the figure has more text, such as captions included, the model assumes that the figure contains data about Natural Language Processing (N.L.P.), other issues include types of charts that occupy
+a low percentage of the overall dataset such Pareto Charts are occurring frequently in queries. 
 
-The solution is thus to fine tune the model to the dataset of ACLs figures type, the challenge being that there is a limited 
-a limited number of labelled data. In total there is only 1671 labeled images in the pilot (training) dataset. 
+The solution is thus to fine tune the model to the dataset of ACLs figures type, the
+challenge being that there is a limited number of labelled data. In total there is only
+1671 labeled images in the pilot (training) dataset. 
+
+\subsubsection{Creating the labeled data}
+As mentioned in the data section of the report the labeled data in under pilot data. To use pilot data it was necessary to clean up the data structure to begin creating labeled data. For example each of the directories represented one of the labels, however the directory names were not a one-to-one with labels that were used through out the rest of the application. For example, "box plot" is a label for box plot figures, the directory in which this labeled data is stored is "boxplot". "NLP text\_grammar\_eg" also needed to be changed to the standard used "natural language processing", and "Screenshots" to "screenshot".
+
+Next a Python Script was created to collect all of the data in each of these directories ignoring the directories that were added during flattening, i.e. png and metadata directories. 
 
 
-\subsubsection{Training Sentence Transformers}
 
-% 11-17
+\subsubsection{Loading CLIP and Processor}
+The SentenceTransformer wrapper for the model was very efficient but the model in the
+SentenceTransformer is not able to directly apply transfer learning. Resulting in the 
+application of importing and using torch and clip directly. 
 
-\subsection{Pytorch CLIP model vs using Sentence Transformers }
+\subsection{Pytorch CLIP Model vs Using Sentence Transformers}
+
 % 11-18
 
 
 \subsection{Pytorch} 
 % 11-23
 Discuss using Sentence Transformers. 
-
-\subsection{Tokenization} 
-% 11-27
-The tokenization is input sensitive
 
 
 \section{Search}
@@ -162,6 +169,8 @@ discus applying filters: https://www.elastic.co/guide/en/elasticsearch/reference
 \section{Search improvements}
 % 12-03
 \subsection{Multi modal}
+One key feature of FindFirst is that allows for the user to query based not only on the 
+query that is semantically 
 % 12-04
 Showing how the search improves with multi modal 
 \subsection{Re-render on users clicking check boxes}
@@ -178,8 +187,8 @@ Using a the image CLIP model to do image classification has limitations.
 
 
 \begin{thebibliography}{99}
-\bibitem{OpenAI} OpenAI (2023, July 8). CLIP. GitHub; OpenAI. https://github.com/openai/CLIP
-\bibitem{SBERT} SentenceTransformers Documentation — Sentence-Transformers documentation. (n.d.). Www.sbert.net. https://www.sbert.net/
+\bibitem{OpenAI} OpenAI (2023, July 8). CLIP. GitHub; OpenAI. \url{https://github.com/openai/CLIP}
+\bibitem{SBERT} SentenceTransformers Documentation — Sentence-Transformers documentation. (n.d.). www.sbert.net. \url{https://www.sbert.net/}
 
 
 \end{thebibliography}
