@@ -1,12 +1,26 @@
 \documentclass[article, 10pt]{article} 
-\usepackage{graphicx} % Required for inserting images
+\usepackage{graphicx, booktabs, multirow, multicol} % Required for inserting images
 % \usepackage{biblatex}
 % \usepackage{hyperref}
 \usepackage[pdftex,bookmarksnumbered,hidelinks,breaklinks]{hyperref}
 % \usepackage[hyphens]{url}  %% be sure to specify the option 'hyphens'
 \usepackage{pythonhighlight}
+\usepackage{caption}
+\captionsetup[table]{
+  labelsep=newline,
+  justification=justified,
+  singlelinecheck=false,
+  textfont=it,
+}
 \graphicspath{ {./images/} }
 \usepackage{listings}
+  \lstdefinestyle{tree}{
+    literate=
+    {├}{{\smash{\raisebox{-1ex}{\rule{1pt}{\baselineskip}}}\raisebox{0.5ex}{\rule{1ex}{1pt}}}}1 
+    {│}{{\smash{\raisebox{-1ex}{\rule{1pt}{\baselineskip}}}\raisebox{0.5ex}{\rule{1ex}{0pt}}}}1
+    {─}{{\raisebox{0.5ex}{\rule{1.5ex}{1pt}}}}1 
+    {└}{{\smash{\raisebox{0.5ex}{\rule{1pt}{\dimexpr\baselineskip-1.5ex}}}\raisebox{0.5ex}{\rule{1ex}{1pt}}}}1 
+  }
 \title{FindFirst Image Similarity Search \\ \large Dr. Jian Wu  Information Retrieval}
 
 \author{Raphael J. Sandor }
@@ -17,12 +31,14 @@
 \maketitle
 
 \section{Introduction}
-The objective of FindFirst Image similarity search is create a search engine that is capable of text to image 
-and image to image search while using semantic understanding to render the closest image to the provided query. 
-The search engine must be able to classify a given image between the nineteen different types of figures.
-With a responsive interface to a users requests, i.e. images return to the user in less than a second. 
-Other features that were employed in the application was probabilistic approach to labeling the images to figure
-classifications as is discussed later in this report, as well investigation into improving the classification model. 
+The objective of FindFirst Image similarity search is create a search engine that is 
+capable of text to image and image to image search while using semantic understanding to 
+render the closest image to the provided query. 
+The search engine must be able to classify a given image between the nineteen different 
+types of figures. With a responsive interface to a users requests, i.e. images return to
+the user in less than a second. Other features that were employed in the application was
+probabilistic approach to labeling the images to figure classifications as is discussed 
+later in this report, as well investigation into improving the classification model. 
 
 % TODO ON SATURDAY 11-18-2023
 
@@ -34,31 +50,72 @@ classifications as is discussed later in this report, as well investigation into
 % - PLEASE REFERENCE THE PAPER 
 % - CHALLENGES OF THE DATA
 \subsection{About the data}
-Descriptions about what we know about the data.
-\begin{enumerate}
-    \item Algorithms
-    \item Architecture Diagrams 
-    \item Bar Charts 
-    \item Box Plots 
-    \item Confusion Matrix
-    \item Graphs
-    \item Line Graph Chart
-    \item Geographical Map
-    \item Natural Image
-    \item Neural Network Diagram 
-    \item Natural Language Processing 
-    \item Pareto Chart 
-    \item Pie Chart 
-    \item Scatter Chart 
-    \item Screenshot 
-    \item Table 
-    \item Tree Diagram 
-    \item Venn Diagram 
-    \item Word Cloud 
-\end{enumerate}
+The ACL dataset consists of two types of data, SciFig and SciFig-pilot which is labeled data. 
+SciFig dataset consists of 263,952 unlabelled images spread across nineteen different
+figure types which are enumerated in Table \ref{table:label-dist} with their respective distributions: 
+
+\begin{table}
+    \begin{tabular}{c|c||c|c}
+    \hline
+     Class                  &  \%   & Class         &  \% \\ \hline
+     Trees                  & 13    & Graphs        & 6 \\  \hline
+     Natural Images         & 8     & Tables        & 6 \\  \hline
+     Confusion Matrix       & 7     & Screenshots   & 6 \\  \hline
+     Pie Charts             & 6     & Bar Charts    & 6 \\  \hline
+     NLP text/grammar       & 6     & Box plots     & 2 \\  \hline
+     Architecture Diagram   & 6     & Venn Diagram  & 1 \\  \hline
+     Algorithm              & 6     & Word Cloud    & 1 \\  \hline
+     Neural Networks        & 6     & Pareto        & 1 \\  \hline
+     Line Graph             & 6     &               & \\  \hline
+    \end{tabular}
+    \caption{Distribution \cite{ACL}}
+    \label{table:label-dist}
+\end{table}
+
+The figures are located under the data/SciFig/png, as shown in Figure \ref{fig:directory-structure}, the metadata is located under data/SciFig/metadata. 
+
+\begin{figure}
+    \centering
+    \caption{Directory Structure}
+    \label{fig:directory-structure}
+\begin{lstlisting}[style=tree]
+data/
+├── SciFig
+│   ├── metadata
+│   └── png
+└── SciFig-pilot
+    ├── algorithms
+    ├── architecture diagram
+    ├── bar charts
+    ├── boxplots
+    ├── confusion matrix
+    ├── graph
+    ├── Line graph_chart
+    ├── maps
+    ├── metadata
+    ├── natural images
+    ├── neural networks
+    ├── NLP text_grammar_eg
+    ├── pareto
+    ├── pie chart
+    ├── png
+    ├── scatter plot
+    ├── Screenshots
+    ├── tables
+    ├── trees
+    ├── venn diagram
+    └── word cloud
+\end{lstlisting}
+\end{figure}
+
 \subsection{The metadata}
-% TODO ON MONDAY 11-20-2023
-Example of the metadata.
+The metadata provided for SciFig dataset included details about location of the detected 
+figures in "raw\_detected\_boxes", as well the output of figures which could be either "raw\_pdffigures\_output" or under Figures. Each figure type containing figure type which is either Table or Figure. Name, caption boundary, image text or caption text, page location, uri, page, and dpi. The metadata was extracted in the orginal work using PDFFigures2 and DeepFigures \cite{ACL}.
+
+The fields referenced in FindFirst were name, figure type. The figure type being used to determine if a prediction was needed to be made as tables were always accurately classified. 
+
+\subsection{The pilot-data}
+The pilot data consists of 19 different labels differentiated by the directory in which the files images that in each belong. The tree was flattened from it original orientation in which each of the image classes were located under png. The choice to preserve all of the classes and place every classes images also in the png directory was so that the SciFig and SciFig-pilot's directories were the same orientation in the png directory which is useful for testing; requiring only a single path to be changed. 
 
 \section{Project Architecture}
 % TUESDAY 11-21
@@ -80,7 +137,11 @@ Create microservice for Pytorch.
 % 11-26
 
 \section{CLIP}
-As mentioned in https://github.com/openai/CLIP the original zero-shot clip model has been trained on 1.28M labelled examples which allows for the user of the model to be able to do semantic search \cite{OpenAI}. This allows the user of the model to provide an a sentence in the from of string characters to the model and receive and vector representing the string. The same is true for providing an image, such png or jpeg, to the model. 
+As mentioned in https://github.com/openai/CLIP the original zero-shot clip model has been
+trained on 1.28M labelled examples which allows for the user of the model to be able to do
+semantic search \cite{OpenAI}. This allows the user of the model to provide an a sentence in 
+the from of string characters to the model and receive and vector representing the string. The 
+same is true for providing an image, such png or jpeg, to the model. 
 
 This allows the user to use the vector data to compare texts to and image, and use the image in search engines such as elastic search which can use  k-nearest-neighbors (KNN) search. 
 
@@ -176,18 +237,20 @@ Showing how the search improves with multi modal
 \subsection{Re-render on users clicking check boxes}
 % 12-05
 \subsection{Images are cached to be reused in queries}
-% 12-06
+% 12-05
 
 \subsection{Find Similar}
-% 12-07
+% 12-05
 
 \section{Lessons learned} 
-% 12-08
+% 12-05
 Using a the image CLIP model to do image classification has limitations. 
 
 
 \begin{thebibliography}{99}
 \bibitem{OpenAI} OpenAI (2023, July 8). CLIP. GitHub; OpenAI. \url{https://github.com/openai/CLIP}
+\bibitem{ACL} SciFig: A Scientific Figure Dataset for Figure Understanding. (2022). \url{https://openreview.net/pdf?id=tYxt7Y0os6I}
+
 \bibitem{SBERT} SentenceTransformers Documentation — Sentence-Transformers documentation. (n.d.). www.sbert.net. \url{https://www.sbert.net/}
 
 
