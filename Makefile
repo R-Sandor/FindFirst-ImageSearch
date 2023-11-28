@@ -7,7 +7,7 @@ default:
 	$(MAKE) build_client
 
 server: 
-	cd ./server && ./gradlew build && cd .. && docker build -t findfirst-backend -f ./docker/server/Dockerfile ./server
+	cd ./server && ./gradlew build -x test && cd .. && docker build -t findfirst-backend -f ./docker/server/Dockerfile ./server
 
 frontend: 
 	docker build -t findfirst-frontend -f ./docker/frontend/Dockerfile ./frontend
