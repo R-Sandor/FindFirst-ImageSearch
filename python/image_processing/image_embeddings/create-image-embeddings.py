@@ -9,7 +9,7 @@ import argparse
 from sentence_transformers import SentenceTransformer
 from elasticsearch import Elasticsearch, SSLError
 from elasticsearch.helpers import parallel_bulk
-from PIL import Image
+from PIL import Image, ImageFile
 from tqdm import tqdm
 from datetime import datetime
 from exif import Image as exifImage
@@ -24,13 +24,12 @@ DEST_INDEX = "academic-images"
 DELETE_EXISTING = True
 CHUNK_SIZE = 100
 
-# Sample set
-#PATH_TO_IMAGES = "../../frontend/public/*.png"
-#PREFIX="../../frontend/public/"
+PATH_TO_IMAGES = "../../../data/SciFig/png/*.png" 
+# PATH_TO_IMAGES = "../../../data/SciFig-pilot/png/*.png" 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-PATH_TO_IMAGES = "../../../data/SciFig-pilot/png/*.png" 
-
-PREFIX = "../../../data/SciFig-pilot/png/"
+PREFIX = "../../../data/SciFig/png/"
+# PREFIX = "../../../data/SciFig-pilot/png/"
 
 CA_CERT='../../../conf/ca.crt'
 
@@ -86,9 +85,8 @@ labels = [
 ]
 tkns = ["image of a "+ label for label in labels]
 
-def make_prediction(img, model):
+def make_prediction(image_features, model):
     with torch.no_grad():
-        image_features = model.encode(img, convert_to_tensor=True)
         text_features = model.encode(tkns, convert_to_tensor=True)
 
     # Pick the top 3 most similar labels for the image
@@ -117,16 +115,20 @@ def main():
     filenames = glob.glob(args.data_path, recursive=True)
     start_time = time.perf_counter()
     for filename in tqdm(filenames, desc='Processing files', total=len(filenames)):
+        print(filename)
         image = Image.open(filename)
 
         doc = {}
-        embedding = image_embedding(image, img_model)
         doc['_id'] = create_image_id(filename)
-        doc['embedding'] = embedding.tolist()
         doc['path'] = os.path.relpath(filename).split(PREFIX)[1]
-        doc['predictions'] = make_prediction(image, img_model) 
+        embedding = img_model.encode(image, convert_to_tensor=True)
+        doc['embedding'] = embedding.tolist()
+        doc['predictions'] = make_prediction(embedding, img_model) 
 
         lst.append(doc)
+
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(lst, f, indent=4, ensure_ascii=False)
 
     duration = time.perf_counter() - start_time
     print(f'Duration creating image embeddings = {duration}')
