@@ -113,22 +113,47 @@ def main():
     print(f'Duration load model = {duration}')
 
     filenames = glob.glob(args.data_path, recursive=True)
+
+    filenameList = chunks(filenames, 1000)
     start_time = time.perf_counter()
-    for filename in tqdm(filenames, desc='Processing files', total=len(filenames)):
-        print(filename)
-        image = Image.open(filename)
+    for fList in filenameList: 
+        for filename in tqdm(fList, desc='Processing files', total=len(fList)):
+            # print(filename)
+            image = Image.open(filename)
 
-        doc = {}
-        doc['_id'] = create_image_id(filename)
-        doc['path'] = os.path.relpath(filename).split(PREFIX)[1]
-        embedding = img_model.encode(image, convert_to_tensor=True)
-        doc['embedding'] = embedding.tolist()
-        doc['predictions'] = make_prediction(embedding, img_model) 
+            doc = {}
+            doc['_id'] = create_image_id(filename)
+            doc['path'] = os.path.relpath(filename).split(PREFIX)[1]
+            embedding = img_model.encode(image, convert_to_tensor=True)
+            doc['embedding'] = embedding.tolist()
+            doc['predictions'] = make_prediction(embedding, img_model) 
 
-        lst.append(doc)
+            lst.append(doc)
 
-    with open('data.json', 'w', encoding='utf-8') as f:
-        json.dump(lst, f, indent=4, ensure_ascii=False)
+        # Open the JSON file in append mode
+        with open('data.json', 'a') as f:
+            # Move the file pointer to the end of the file
+            f.seek(0,2)
+
+            js =  json.dumps(lst, indent=4)
+            # If the file is not empty, add a comma separator
+            if f.tell() > 0:
+                f.write(',')
+                js = (js[1:])
+
+            f.write(js)
+            # Write the new JSON object to the file
+            # json.dump(lst, f, indent=4)
+
+        # Truncate the file to remove any extra brackets
+        with open('data.json', 'r+') as f:
+            f.seek(0,2)
+            size = f.tell()
+            f.truncate(size-1)
+        lst = []
+
+    with open('data.json', 'a') as f:
+       f.write(']') 
 
     duration = time.perf_counter() - start_time
     print(f'Duration creating image embeddings = {duration}')
@@ -196,6 +221,10 @@ def main():
         else:
             raise
 
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 def image_embedding(image, model):
     return model.encode(image)
