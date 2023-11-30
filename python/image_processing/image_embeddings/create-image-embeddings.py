@@ -22,6 +22,7 @@ ES_TIMEOUT = 3600
 
 DEST_INDEX = "academic-images"
 DELETE_EXISTING = True
+UPLOAD_EXISTING = True
 CHUNK_SIZE = 100
 
 PATH_TO_IMAGES = "../../../data/SciFig/png/*.png" 
@@ -54,6 +55,9 @@ parser.add_argument('--timeout', dest='timeout', required=False, default=ES_TIME
 parser.add_argument('--delete_existing', dest='delete_existing', required=False, default=True,
                     action=argparse.BooleanOptionalAction,
                     help="Delete existing indices if they are present in the cluster. Default: True")
+parser.add_argument('--upload_existing', dest='upload_existing', required=False, default=True,
+                    action=argparse.BooleanOptionalAction,
+                    help="uses default data.json if there is one. Default: True")
 parser.add_argument('--ca_certs', dest='ca_certs', required=False, default=CA_CERT,
                     help="Path to CA certificate.") # Default: ../app/conf/ess-cloud.cer")
 parser.add_argument('--extract_GPS_location', dest='gps_location', required=False, default=False,
@@ -112,9 +116,19 @@ def main():
     duration = time.perf_counter() - start_time
     print(f'Duration load model = {duration}')
 
+    UPLOAD_EXISTING = args.upload_existing
+    if (UPLOAD_EXISTING): 
+        if os.path.exists("./data.json"):
+            with open('data.json', 'r') as f:
+                print("opening file")
+                lst = json.load(f)
+                proccessDocs(lst)
+            return 
+
     filenames = glob.glob(args.data_path, recursive=True)
     if os.path.exists("./data.json"):
-        os.remove("./data.json")
+        
+        print("HERE")
     filenameList = chunks(filenames, 1000)
     start_time = time.perf_counter()
     for fList in filenameList: 
@@ -161,6 +175,11 @@ def main():
     duration = time.perf_counter() - start_time
     print(f'Duration creating image embeddings = {duration}')
 
+    proccessDocs(lst)
+
+
+def proccessDocs(lst): 
+    print("Processing docs")
     es = Elasticsearch(hosts=ES_HOST)
     if args.ca_certs:
         es = Elasticsearch(
