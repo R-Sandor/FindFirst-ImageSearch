@@ -176,6 +176,8 @@ services:
       context: ./frontend
     ports: 
      - 3000:3000
+    volumes:
+      - ./data/SciFig/png:/app/public/png
   backend:
     build: 
       dockerfile: ../docker/server/Dockerfile
