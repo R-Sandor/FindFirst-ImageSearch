@@ -127,8 +127,7 @@ def main():
 
     filenames = glob.glob(args.data_path, recursive=True)
     if os.path.exists("./data.json"):
-        
-        print("HERE")
+        os.remove("./data.json")
     filenameList = chunks(filenames, 1000)
     start_time = time.perf_counter()
     for fList in filenameList: 
