@@ -113,7 +113,8 @@ def main():
     print(f'Duration load model = {duration}')
 
     filenames = glob.glob(args.data_path, recursive=True)
-
+    if os.path.exists("./data.json"):
+        os.remove("./data.json")
     filenameList = chunks(filenames, 1000)
     start_time = time.perf_counter()
     for fList in filenameList: 
@@ -152,8 +153,10 @@ def main():
             f.truncate(size-1)
         lst = []
 
-    with open('data.json', 'a') as f:
-       f.write(']') 
+    with open('data.json', 'a+') as f:
+        f.write(']') 
+        f.seek(0,0)
+        lst = json.load(f)
 
     duration = time.perf_counter() - start_time
     print(f'Duration creating image embeddings = {duration}')
