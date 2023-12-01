@@ -1,18 +1,27 @@
-\documentclass[article, 10pt]{article} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Setup                                                                                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \documentclass[article, 11pt]{article} 
+% \usepackage[margin=1in]{geometry}
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
+
+\IEEEoverridecommandlockouts                              % This command is only
+                                                          % needed if you want to
+                                                          % use the \thanks command
+\overrideIEEEmargins
 \usepackage{graphicx, booktabs, multirow, multicol} % Required for inserting images
-% \usepackage{biblatex}
-% \usepackage{hyperref}
-\usepackage[pdftex,bookmarksnumbered,hidelinks,breaklinks]{hyperref}
-% \usepackage[hyphens]{url}  %% be sure to specify the option 'hyphens'
-\usepackage{pythonhighlight}
 \usepackage{caption}
+\usepackage[pdftex,bookmarksnumbered,hidelinks,breaklinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{pythonhighlight}
+\usepackage{minted}
+\graphicspath{ {./images/} }
 \captionsetup[table]{
   labelsep=newline,
   justification=justified,
   singlelinecheck=false,
   textfont=it,
 }
-\graphicspath{ {./images/} }
 \usepackage{listings}
   \lstdefinestyle{tree}{
     literate=
@@ -21,8 +30,9 @@
     {─}{{\raisebox{0.5ex}{\rule{1.5ex}{1pt}}}}1 
     {└}{{\smash{\raisebox{0.5ex}{\rule{1pt}{\dimexpr\baselineskip-1.5ex}}}\raisebox{0.5ex}{\rule{1ex}{1pt}}}}1 
   }
+  
 \title{FindFirst Image Similarity Search \\ \large Dr. Jian Wu  Information Retrieval}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \author{Raphael J. Sandor }
 \date{November 2023}
 
@@ -54,7 +64,7 @@ The ACL dataset consists of two types of data, SciFig and SciFig-pilot which is 
 SciFig dataset consists of 263,952 unlabelled images spread across nineteen different
 figure types which are enumerated in Table \ref{table:label-dist} with their respective distributions: 
 
-\begin{table}
+\begin{table}[h]
     \begin{tabular}{c|c||c|c}
     \hline
      Class                  &  \%   & Class         &  \% \\ \hline
@@ -74,7 +84,7 @@ figure types which are enumerated in Table \ref{table:label-dist} with their res
 
 The figures are located under the data/SciFig/png, as shown in Figure \ref{fig:directory-structure}, the metadata is located under data/SciFig/metadata. 
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \caption{Directory Structure}
     \label{fig:directory-structure}
@@ -110,31 +120,40 @@ data/
 
 \subsection{The metadata}
 The metadata provided for SciFig dataset included details about location of the detected 
-figures in "raw\_detected\_boxes", as well the output of figures which could be either "raw\_pdffigures\_output" or under Figures. Each figure type containing figure type which is either Table or Figure. Name, caption boundary, image text or caption text, page location, uri, page, and dpi. The metadata was extracted in the orginal work using PDFFigures2 and DeepFigures \cite{ACL}.
+figures in "raw\_detected\_boxes", as well the output of figures which could be either "raw\_pdffigures\_output" or under Figures. Each figure type containing figure type which is either Table or Figure. Name, 
+caption boundary, image text or caption text, page location, uri, page, and dpi. The metadata was extracted 
+in the orginal work using PDFFigures2 and DeepFigures \cite{ACL}.
 
-The fields referenced in FindFirst were name, figure type. The figure type being used to determine if a prediction was needed to be made as tables were always accurately classified. 
+The fields referenced in FindFirst were name, figure type, and caption data. The figure type was examined 
+to determine if a prediction was required. If the figure was a table then there was no need to use CLIP model
+to predict its classification because the PDFFigures2 and DeepFigures always accurately determined if the image was a table. 
 
 \subsection{The pilot-data}
-The pilot data consists of 19 different labels differentiated by the directory in which the files images that in each belong. The tree was flattened from it original orientation in which each of the image classes were located under png. The choice to preserve all of the classes and place every classes images also in the png directory was so that the SciFig and SciFig-pilot's directories were the same orientation in the png directory which is useful for testing; requiring only a single path to be changed. 
+The pilot data consists of 19 different labels differentiated by the directory in which the files are located.
+The tree was flattened from it original orientation in which each of the image classes were located under png.
+The choice to preserve all of the classes and place every classes images also in the png directory was so that 
+the SciFig and SciFig-pilot's directories were the same orientation in the png directory which is useful for 
+testing; requiring only a single path to be changed. 
 
 \section{Project Architecture}
-% TUESDAY 11-21
+The project consists of several layers UI/Frotned, BI/Server, Flask and Elasticsearch, see Figure 
+\ref{fig:architecture} below. The UI i.e., frontend is written in the JavaScript framework NextJS/React.
+With NextJS being a framework that uses React and manages the routing and rendering of React components. 
+A Flask microservice was deployed to leverage Pytorch and CLIP model,
+thus queries from the user interface arrive to Spring rest endpoints and are then sent to the Flask
+microservice to get a vector representation of a given image or text.
+Elasticsearch is responsible for the k-NN and finding similar images with the emedding from the queries from 
+flask, as well as storing the embedding from corpus of images. 
+Lastly, Spring Boot 3.1.2 handles returning the results of the 
+requests to the frontend and acts a central backend, connecting frontend requests to Flask and Flasks embedding back to Elasticssearch for the quires. 
 
-\subsection{Proposed solution}
-% WEDNESDAY 11-22
+\begin{figure}[h]
+\includegraphics[width=\linewidth]{Architecture.png}
+\caption{Application Architecture}
+\label{fig:architecture}
+\end{figure}
 
-\subsection{Changes in design}
-% THURSDAY (THANKSGIVING) 11-23-2023
-Create microservice for Pytorch.
 
-\section{Deployment}
-% 11-24
-
-\subsection{System Requirements}
-% 11-25
-
-\subsection{Performance}
-% 11-26
 
 \section{CLIP}
 As mentioned in https://github.com/openai/CLIP the original zero-shot clip model has been
@@ -146,37 +165,29 @@ same is true for providing an image, such png or jpeg, to the model.
 This allows the user to use the vector data to compare texts to and image, and use the image in search engines such as elastic search which can use  k-nearest-neighbors (KNN) search. 
 
 \subsection{Sentence Transformers}
-The model card that is available on GitHub from OpenAI/CLIP was initially used for the classification of the models
-\begin{python}
-import torch
-import clip
-from PIL import Image
+The model card that is available on GitHub from OpenAI/CLIP was initially used for the classification of the models.
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device)
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/openAI.png}
+    \caption{OpenAI CLIP \cite{OpenAI}}
+    \label{fig:openAI-clip}
+\end{figure}
 
-image = preprocess(Image.open("CLIP.png")).unsqueeze(0).to(device)
-text = clip.tokenize(["a diagram", "a dog", "a cat"]).to(device)
-
-with torch.no_grad():
-    image_features = model.encode_image(image)
-    text_features = model.encode_text(text)
-    
-    logits_per_image, logits_per_text = model(image, text)
-    probs = logits_per_image.softmax(dim=-1).cpu().numpy()
-
-print("Label probs:", probs)  # prints: [[0.9927937  0.00421068 0.00299572]]
-\end{python} \cite{OpenAI}
 The model out of the box is as shown above is not optimized for hardware. For example running the model on image to predictions produced 4.25 classifications per second, on a dataset of 264k images this would take nearly seventeen and half hours to complete. 
 
 Pre-optimized solutions were researched to reduce the amount of time to produce classifications on the full dataset. This resulted in testing the use of SBERT CLIP model with their sentence-transformer \cite{SBERT}.
 The predictions on the Sentence-Transformer verses the native Pytorch model were within
-tolerance of approximately .020-.026 with Sentence-Transformers producing 17.5/its, thereby reducing the prediction time to 4.19 hours.
+tolerance of approximately .020-.026 with Sentence-Transformers producing 27.4/its, thereby reducing embedding
+and classification time to under 3 hours.
 
 \subsubsection{Tokenization}
 % Discuss Sensitivity to class string.
+One consideration when creating the classification labels was the spelling of the words as discussed in the data section but also the tokens used to describe the data. For example using the classifications labels results in poor performance up to -.20 compared to wrapping 
+label in sentence such that a box plot became the token "an image of a box plox". Other phrases were tried such as "diagram of a", figure, picture, photograph, photo, but image 
+seemed to perform the best of those tried. 
 
-\subsection{Fine Tuning CLIP}
+\subsection{The Need to Fine Tune CLIP}
 There is one problem with this, while model itself provides adequate results for general text to image, and image to image translation e.g. "cats on a bed", it doesn't perform well for tasks specialized classification on labels.
 Using the zero shot model in the application of classifying images on 19 different labels from ACL Academic Figure set revealed that there is glaring bias to certain classifications. For example, when the figure has more text, such as captions included, the model assumes that the figure contains data about Natural Language Processing (N.L.P.), other issues include types of charts that occupy
 a low percentage of the overall dataset such Pareto Charts are occurring frequently in queries. 
@@ -190,16 +201,30 @@ As mentioned in the data section of the report the labeled data in under pilot d
 
 Next a Python Script was created to collect all of the data in each of these directories ignoring the directories that were added during flattening, i.e. png and metadata directories. 
 
-
+\subsection{Next Steps}
+The task of fine tuning was unfinished by the resolution of project due to constraints on time. However, the 
+necessary steps to proceed and avenues to expand this project are detailed.
 
 \subsubsection{Loading CLIP and Processor}
-The SentenceTransformer wrapper for the model was very efficient but the model in the
-SentenceTransformer is not able to directly apply transfer learning. Resulting in the 
-application of importing and using torch and clip directly. 
-
+The SentenceTransformer wrapper for the model was very efficient but the model in the SentenceTransformer is not able to directly apply transfer learning.
+Resulting in the application of importing and using Torch and Clip directly. 
+\begin{python}
+model =
+  CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+processor = 
+  CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+\end{python}
 \subsection{Pytorch CLIP Model vs Using Sentence Transformers}
 
 % 11-18
+\section{Deployment}
+% 11-24
+
+\subsection{System Requirements}
+% 11-25
+
+\subsection{Performance}
+% 11-26
 
 
 \subsection{Pytorch} 
@@ -250,10 +275,7 @@ Using a the image CLIP model to do image classification has limitations.
 \begin{thebibliography}{99}
 \bibitem{OpenAI} OpenAI (2023, July 8). CLIP. GitHub; OpenAI. \url{https://github.com/openai/CLIP}
 \bibitem{ACL} SciFig: A Scientific Figure Dataset for Figure Understanding. (2022). \url{https://openreview.net/pdf?id=tYxt7Y0os6I}
-
 \bibitem{SBERT} SentenceTransformers Documentation — Sentence-Transformers documentation. (n.d.). www.sbert.net. \url{https://www.sbert.net/}
-
-
 \end{thebibliography}
 
 \end{document}
