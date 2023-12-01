@@ -156,8 +156,6 @@ def main():
                 js = (js[1:])
 
             f.write(js)
-            # Write the new JSON object to the file
-            # json.dump(lst, f, indent=4)
 
         # Truncate the file to remove any extra brackets
         with open('data.json', 'r+') as f:
