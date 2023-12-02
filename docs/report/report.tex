@@ -50,8 +50,7 @@ the user in less than a second. Other features that were employed in the applica
 probabilistic approach to labeling the images to figure classifications as is discussed 
 later in this report, as well investigation into improving the classification model. 
 
-% TODO ON SATURDAY 11-18-2023
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Data}
 % TODO ON SUNDAY 11-19-2023
 % DISCUSS ACL FIGURE DATA SET 
@@ -82,7 +81,8 @@ figure types which are enumerated in Table \ref{table:label-dist} with their res
     \label{table:label-dist}
 \end{table}
 
-The figures are located under the data/SciFig/png, as shown in Figure \ref{fig:directory-structure}, the metadata is located under data/SciFig/metadata. 
+The figures are located under the data/SciFig/png, as shown in Figure \ref{fig:directory-structure}, 
+the metadata is located under data/SciFig/metadata. 
 
 \begin{figure}[h]
     \centering
@@ -120,13 +120,15 @@ data/
 
 \subsection{The metadata}
 The metadata provided for SciFig dataset included details about location of the detected 
-figures in "raw\_detected\_boxes", as well the output of figures which could be either "raw\_pdffigures\_output" or under Figures. Each figure type containing figure type which is either Table or Figure. Name, 
-caption boundary, image text or caption text, page location, uri, page, and dpi. The metadata was extracted 
-in the orginal work using PDFFigures2 and DeepFigures \cite{ACL}.
+figures in "raw\_detected\_boxes", as well the output of figures which could be either
+ "raw\_pdffigures\_output"  or under Figures. Each figure type containing figure type which is either Table 
+ or Figure. Name, caption boundary, image text or caption text, page location, uri, page, and dpi.
+The metadata was extracted in the orginal work using PDFFigures2 and DeepFigures \cite{ACL}.
 
 The fields referenced in FindFirst were name, figure type, and caption data. The figure type was examined 
 to determine if a prediction was required. If the figure was a table then there was no need to use CLIP model
-to predict its classification because the PDFFigures2 and DeepFigures always accurately determined if the image was a table. 
+to predict its classification because the PDFFigures2 and DeepFigures always accurately determined if the 
+image is a table. 
 
 \subsection{The pilot-data}
 The pilot data consists of 19 different labels differentiated by the directory in which the files are located.
@@ -140,12 +142,12 @@ The project consists of several layers UI/Frotned, BI/Server, Flask and Elastics
 \ref{fig:architecture} below. The UI i.e., frontend is written in the JavaScript framework NextJS/React.
 With NextJS being a framework that uses React and manages the routing and rendering of React components. 
 A Flask microservice was deployed to leverage Pytorch and CLIP model,
-thus queries from the user interface arrive to Spring rest endpoints and are then sent to the Flask
-microservice to get a vector representation of a given image or text.
-Elasticsearch is responsible for the k-NN and finding similar images with the emedding from the queries from 
-flask, as well as storing the embedding from corpus of images. 
-Lastly, Spring Boot 3.1.2 handles returning the results of the 
-requests to the frontend and acts a central backend, connecting frontend requests to Flask and Flasks embedding back to Elasticssearch for the quires. 
+thus queries from the user interface arrive to Spring rest endpoints and are then sent to the Flask 
+microservice to get a vector representation of a given image or text. Elasticsearch is responsible for the 
+k-NN and finding similar images with the emedding from the queries from flask, as well as storing the 
+embedding from corpus of images. Lastly, Spring Boot 3.1.2 handles returning the results of the requests to 
+the frontend and acts a central backend, connecting frontend requests to Flask and Flasks embedding back to 
+Elasticssearch for the quires. 
 
 \begin{figure}[h]
 \includegraphics[width=\linewidth]{Architecture.png}
@@ -153,7 +155,7 @@ requests to the frontend and acts a central backend, connecting frontend request
 \label{fig:architecture}
 \end{figure}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{CLIP}
 As mentioned in https://github.com/openai/CLIP the original zero-shot clip model has been
@@ -162,7 +164,8 @@ semantic search \cite{OpenAI}. This allows the user of the model to provide an a
 the from of string characters to the model and receive and vector representing the string. The 
 same is true for providing an image, such png or jpeg, to the model. 
 
-This allows the user to use the vector data to compare texts to and image, and use the image in search engines such as elastic search which can use  k-nearest-neighbors (KNN) search. 
+This allows the user to use the vector data to compare texts to and image, and use the image in search engines
+ such as elastic search which can use  k-nearest-neighbors (KNN) search. 
 
 \subsection{Sentence Transformers}
 The model card that is available on GitHub from OpenAI/CLIP was initially used for the classification of the models.
@@ -174,62 +177,98 @@ The model card that is available on GitHub from OpenAI/CLIP was initially used f
     \label{fig:openAI-clip}
 \end{figure}
 
-The model out of the box is as shown above is not optimized for hardware. For example running the model on image to predictions produced 4.25 classifications per second, on a dataset of 264k images this would take nearly seventeen and half hours to complete. 
+The model out of the box is as shown above is not optimized for hardware. For example running the model on 
+image to predictions produced 4.25 classifications per second, on a dataset of 264k images this would take 
+nearly seventeen and half hours to complete. 
 
-Pre-optimized solutions were researched to reduce the amount of time to produce classifications on the full dataset. This resulted in testing the use of SBERT CLIP model with their sentence-transformer \cite{SBERT}.
+Pre-optimized solutions were researched to reduce the amount of time to produce classifications on the full 
+dataset. This resulted in testing the use of SBERT CLIP model with their sentence-transformer \cite{SBERT}.
 The predictions on the Sentence-Transformer verses the native Pytorch model were within
 tolerance of approximately .020-.026 with Sentence-Transformers producing 27.4/its, thereby reducing embedding
 and classification time to under 3 hours.
 
 \subsubsection{Tokenization}
 % Discuss Sensitivity to class string.
-One consideration when creating the classification labels was the spelling of the words as discussed in the data section but also the tokens used to describe the data. For example using the classifications labels results in poor performance up to -.20 compared to wrapping 
-label in sentence such that a box plot became the token "an image of a box plox". Other phrases were tried such as "diagram of a", figure, picture, photograph, photo, but image 
-seemed to perform the best of those tried. 
+One consideration when creating the classification labels was the spelling of the words as discussed in the 
+data section but also the tokens used to describe the data. For example using the classifications labels 
+results in poor performance up to -.20 compared to wrapping label in sentence such that a box plot became the
+token "an image of a box plox". Other phrases were tried such as "diagram of a", figure, picture, photograph,
+ photo, but image seemed to perform the best of those tried. 
 
 \subsection{The Need to Fine Tune CLIP}
-There is one problem with this, while model itself provides adequate results for general text to image, and image to image translation e.g. "cats on a bed", it doesn't perform well for tasks specialized classification on labels.
-Using the zero shot model in the application of classifying images on 19 different labels from ACL Academic Figure set revealed that there is glaring bias to certain classifications. For example, when the figure has more text, such as captions included, the model assumes that the figure contains data about Natural Language Processing (N.L.P.), other issues include types of charts that occupy
-a low percentage of the overall dataset such Pareto Charts are occurring frequently in queries. 
+There is one problem with this, while model itself provides adequate results for general text to image, and 
+image to image translation e.g. "cats on a bed", it doesn't perform well for tasks specialized classification 
+on labels. Using the zero shot model in the application of classifying images on 19 different labels from ACL 
+Academic Figure set revealed that there is glaring bias to certain classifications. For example, when the 
+figure has more text, such as captions included, the model assumes that the figure contains data about Natural
+ Language Processing (N.L.P.), other issues include types of charts that occupy a low percentage of the 
+ overall dataset such Pareto Charts are occurring frequently in queries. 
 
 The solution is thus to fine tune the model to the dataset of ACLs figures type, the
 challenge being that there is a limited number of labelled data. In total there is only
 1671 labeled images in the pilot (training) dataset. 
 
 \subsubsection{Creating the labeled data}
-As mentioned in the data section of the report the labeled data in under pilot data. To use pilot data it was necessary to clean up the data structure to begin creating labeled data. For example each of the directories represented one of the labels, however the directory names were not a one-to-one with labels that were used through out the rest of the application. For example, "box plot" is a label for box plot figures, the directory in which this labeled data is stored is "boxplot". "NLP text\_grammar\_eg" also needed to be changed to the standard used "natural language processing", and "Screenshots" to "screenshot".
+As mentioned in the data section of the report the labeled data in under pilot data. To use pilot data it was 
+necessary to clean up the data structure to begin creating labeled data. For example each of the directories 
+represented one of the labels, however the directory names were not a one-to-one with labels that were used 
+through out the rest of the application. For example, "box plot" is a label for box plot figures, the 
+directory in which this labeled data is stored is "boxplot". "NLP text\_grammar\_eg" also needed to be changed
+ to the standard used "natural language processing", and "Screenshots" to "screenshot".
 
-Next a Python Script was created to collect all of the data in each of these directories ignoring the directories that were added during flattening, i.e. png and metadata directories. 
+Next a Python Script was created to collect all of the data in each of these directories ignoring the
+directories that were added during flattening, i.e. png and metadata directories. 
 
 \subsection{Next Steps}
 The task of fine tuning was unfinished by the resolution of project due to constraints on time. However, the 
 necessary steps to proceed and avenues to expand this project are detailed.
 
 \subsubsection{Loading CLIP and Processor}
-The SentenceTransformer wrapper for the model was very efficient but the model in the SentenceTransformer is not able to directly apply transfer learning.
+The SentenceTransformer wrapper for the model was very efficient but the model in the SentenceTransformer is
+not able to directly apply transfer learning.
 Resulting in the application of importing and using Torch and Clip directly. 
+
+\begin{figure}[h]
+\includegraphics[width=\linewidth]{images/loading_model.png}
+\caption{Loading the model \cite{fine-tune}}
+\label{fig:loading_model}
+\end{figure}
+
+\subsubsection{Initializing the dataset}
+The guides that were examined to do fine tuning initialize the dataset. Storing the image path and the 
+caption text in the class. 
+In the case the case of project, the caption text is simple the label with "a image of " as the prefix.  
+
+\subsubsection{Training the model}
+The next step is take the loaded data model that contains the paths to images and the text to fine tune with
+and run the epochs on the model. Comparing the loss with each cycle. These steps were not completed in this
+project but an attempt such as the one in Figure 
+
+\begin{figure}[h]
+\includegraphics[width=\linewidth]{images/fine-tuning.png}
+\caption{Fine Tuning \cite{fine-tune}}
+\label{fig:fine-tune}
+\end{figure}
+
+\subsubsection{Saving the model}
+Last necessary step to is to save the model with:
 \begin{python}
-model =
-  CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-processor = 
-  CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+torch.save(model, './saved-models/fine-tuned')
 \end{python}
-\subsection{Pytorch CLIP Model vs Using Sentence Transformers}
+for further evaluations and improvements. 
 
-% 11-18
-\section{Deployment}
-% 11-24
+\subsubsection{Evaluation}
+To determine how the model performed metrics like an F1 score would be used to conclude if the model 
+is balanced between precision and recall. Requiring a portion of the training dataset to be reserved for 
+taking metrics on the classification. Other researchers have evaluated CLIP on accuracy and comparing clip 
+with other pre-trained models, findd that it was among the top performing have looked at just accuracy 
+\cite{FT-clip} but didn't evaluate the F1 scores.  Such an approach will not work in this problem domain 
+as its goal is to improve classification performance. For example the CLIP model prior to tuning has a bias 
+to certain classifications such NLP grammar, which accuracy may not be able to determine if that improved 
+the bias or not.
 
-\subsection{System Requirements}
-% 11-25
-
-\subsection{Performance}
-% 11-26
 
 
-\subsection{Pytorch} 
-% 11-23
-Discuss using Sentence Transformers. 
 
 
 \section{Search}
@@ -267,15 +306,35 @@ Showing how the search improves with multi modal
 \subsection{Find Similar}
 % 12-05
 
+% 11-18
+\section{Deployment}
+% 11-24
+
+\subsection{System Requirements}
+% 11-25
+
+\subsection{Performance}
+% 11-26
+
+
 \section{Lessons learned} 
 % 12-05
 Using a the image CLIP model to do image classification has limitations. 
 
 
 \begin{thebibliography}{99}
+\bibitem{FT-clip} Dong, X., Bao, J., Zhang, T., Chen, D., Gu, S., Zhang, W., Yuan, L., Chen, D., \& Yu, N. 
+(2022). CLIP Itself is a Strong Fine-tuner: Achieving 85.7\% and 88.0\% Top-1 Accuracy with ViT-B and ViT-L 
+on ImageNet. \url{https://arxiv.org/pdf/2212.06138.pdf}
 \bibitem{OpenAI} OpenAI (2023, July 8). CLIP. GitHub; OpenAI. \url{https://github.com/openai/CLIP}
-\bibitem{ACL} SciFig: A Scientific Figure Dataset for Figure Understanding. (2022). \url{https://openreview.net/pdf?id=tYxt7Y0os6I}
-\bibitem{SBERT} SentenceTransformers Documentation — Sentence-Transformers documentation. (n.d.). www.sbert.net. \url{https://www.sbert.net/}
+\bibitem{ACL} SciFig: A Scientific Figure Dataset for Figure Understanding. (2022). 
+\url{https://openreview.net/pdf?id=tYxt7Y0os6I}
+\bibitem{SBERT} SentenceTransformers Documentation — Sentence-Transformers documentation. (n.d.). 
+www.sbert.net. \url{https://www.sbert.net/}
+\bibitem{indo-style} Vats, S. (2023, June 1).  shashnkvats/Indofashionclip. GitHub. 
+\url{https://github.com/shashnkvats/Indofashionclip/blob/main/indofashion_clip.py}
+\bibitem{fine-tune}  vinson22333. (2021, April 8). CLIP Training Code Issue \#83 openai/CLIP. GitHub; OpenAI. 
+\url{https://github.com/openai/CLIP/issues/83}
 \end{thebibliography}
 
 \end{document}
