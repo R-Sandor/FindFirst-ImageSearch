@@ -43,6 +43,7 @@ public class ImageSearchService {
    */
   public List<AcademicImage> findByQuery(String text, int k, String... imageClasses) {
     return queryByImageVect(torch.getEmbeddings(text), imageClasses).stream()
+        .limit(k)
         .map(h -> h.source())
         .toList();
   }
