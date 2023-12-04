@@ -3,8 +3,8 @@
 
 default: 
 	cd server; ./gradlew clean build
-	$(MAKE) build_server
-	$(MAKE) build_client
+	$(MAKE) server
+	$(MAKE) client
 
 server: 
 	cd ./server && ./gradlew build -x test && cd .. && docker build -t findfirst-backend -f ./docker/server/Dockerfile ./server
