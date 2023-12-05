@@ -1,13 +1,8 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from PIL import Image, ImageFile
-import sklearn
+from PIL import Image 
 from tqdm import tqdm
-from datetime import datetime
-from exif import Image as exifImage
 from sentence_transformers import SentenceTransformer
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import classification_report
 
 import torch
 
